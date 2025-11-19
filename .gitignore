@@ -1,3 +1,7 @@
-garbage_app/.env
+.env
 garbage_app/memo.txt
 .DS_Store
+
+node_modules/
+dist/
+build/
