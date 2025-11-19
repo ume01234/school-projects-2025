@@ -1,0 +1,15 @@
+6QjYC1Zf   #sshの最初の接続パスワード
+
+
+サーバーのユーザー名：
+s2311585
+
+
+Redis共通パスワード
+3dct6cLW
+
+geminiのAPIキー
+AIzaSyBXZ8sMyR7Ar8dgnLAKl2dDHB-UBdAZseI
+
+mysql入り方
+mysql -h 127.0.0.1 -u s2311585 -p
