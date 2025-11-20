@@ -84,6 +84,9 @@ export class PostProcess {
         this.scene = scene;
         this.camera = camera;
         this.composer = new EffectComposer(renderer);
+
+        this.composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
         this.kaleidoscopePass = null;
 
         this.init();
@@ -96,12 +99,12 @@ export class PostProcess {
         this.kaleidoscopePass = new ShaderPass(KaleidoscopeShader);
         this.composer.addPass(this.kaleidoscopePass);
 
-        // Tuned Bloom for Clarity
+        // Reverted Bloom Settings (Slightly brighter than Solemn, but still dark)
         const bloomPass = new UnrealBloomPass(
             new THREE.Vector2(window.innerWidth, window.innerHeight),
-            0.8,  // Strength (Reduced from 2.0)
-            0.3,  // Radius (Reduced from 0.5)
-            0.85  // Threshold (Increased from 0.6)
+            0.15, // Strength (Restored)
+            0.3,  // Radius
+            0.95  // Threshold
         );
         this.composer.addPass(bloomPass);
 
@@ -111,6 +114,7 @@ export class PostProcess {
 
     setSize(width, height) {
         this.composer.setSize(width, height);
+        this.composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     }
 
     render(time) {

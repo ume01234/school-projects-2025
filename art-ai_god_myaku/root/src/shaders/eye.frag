@@ -21,7 +21,6 @@ void main() {
     vec2 uv = vUv * 2.0 - 1.0;
 
     // --- Gaze & Eye Shape ---
-    // Make gaze slower and more wandering if no mouse input
     vec2 gaze = uMouse;
     if (length(uMouse) < 0.01) {
         gaze = vec2(
@@ -34,33 +33,28 @@ void main() {
     float r = length(eyeUv);
 
     // --- Colors (Myaku-Myaku Style) ---
-    // Red: Body/Sclera (Vivid)
-    // Blue: Iris (Vivid)
     
     // 1. Pupil (Black)
-    float pupilSize = 0.25 + sin(uTime * 2.0) * 0.02; // Dilating pupil
+    float pupilSize = 0.25 + sin(uTime * 2.0) * 0.02;
     float pupilMask = smoothstep(pupilSize, pupilSize + 0.01, r);
 
     // 2. Iris (Blue Ring)
     float irisSize = 0.55;
     float irisMask = smoothstep(irisSize, irisSize + 0.05, r);
     
-    // Iris Texture (Striations)
     float angle = atan(eyeUv.y, eyeUv.x);
     float irisNoise = sin(angle * 20.0 + vDisplacement * 10.0);
     vec3 irisColor = uColorBlue * (0.8 + 0.4 * irisNoise);
     
     // 3. Sclera/Body (Red)
-    // Use vDisplacement to create "fleshy" texture
     float fleshNoise = smoothstep(-0.2, 0.5, vDisplacement);
     vec3 fleshColor = mix(uColorRed * 0.5, uColorRed * 1.5, fleshNoise);
     
-    // Veins
     float vein = smoothstep(0.45, 0.5, abs(sin(vDisplacement * 20.0 + angle * 5.0)));
     fleshColor = mix(fleshColor, vec3(0.3, 0.0, 0.0), vein * 0.3);
 
     // Combine Eye Layers
-    vec3 color = vec3(0.0); // Pupil
+    vec3 color = vec3(0.0);
     color = mix(color, irisColor, pupilMask);
     color = mix(color, fleshColor, irisMask);
 
@@ -68,15 +62,13 @@ void main() {
     float fresnel = 1.0 - dot(viewDir, normal);
     fresnel = pow(fresnel, 2.5);
 
-    // Glitter Noise
-    float glitter = step(0.95, random(uv * 10.0 + uTime)); // Sparkles
-    float glitter2 = step(0.98, random(uv * 20.0 - uTime));
+    float glitter = step(0.95, random(uv * 10.0 + uTime));
     
-    vec3 goldLight = uColorGold * 4.0; // Boost for bloom
+    // Gold Boost (Restored to moderate level)
+    vec3 goldLight = uColorGold * 2.0; 
     
-    // Add glitter to the rim
     vec3 rimColor = goldLight * fresnel;
-    rimColor += uColorGold * 10.0 * glitter * fresnel; // Sparkles on edges
+    rimColor += uColorGold * 3.0 * glitter * fresnel; 
     
     color += rimColor;
 

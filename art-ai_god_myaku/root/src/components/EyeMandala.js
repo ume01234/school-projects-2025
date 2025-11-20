@@ -22,7 +22,8 @@ export class EyeMandala {
             fetch('./src/shaders/eye.frag').then(r => r.text())
         ]);
 
-        const geometry = new THREE.SphereGeometry(0.8, 64, 64); // Larger base size (was 0.6)
+        // Massive Base Size
+        const geometry = new THREE.SphereGeometry(1.5, 64, 64); // (was 0.8)
         const material = new THREE.ShaderMaterial({
             vertexShader: vert,
             fragmentShader: frag,
@@ -40,11 +41,11 @@ export class EyeMandala {
 
     arrangeMandala() {
         let index = 0;
-        const layers = 18; // More layers (was 15)
+        const layers = 18;
 
         for (let i = 0; i < layers; i++) {
-            // Wider spread
-            const radius = 1.5 + i * 1.5; // (was 2.0 + i*1.0)
+            // Massive Spread
+            const radius = 3.0 + i * 2.5; // (was 1.5 + i*1.5)
             const itemsInLayer = Math.floor(10 + i * 5);
 
             for (let j = 0; j < itemsInLayer; j++) {
@@ -54,8 +55,7 @@ export class EyeMandala {
                 const x = Math.cos(angle) * radius;
                 const y = Math.sin(angle) * radius;
 
-                // More depth variation
-                const z = (Math.random() - 0.5) * 6.0;
+                const z = (Math.random() - 0.5) * 10.0; // More depth
 
                 this.dummy.position.set(x, y, z);
 
@@ -63,8 +63,8 @@ export class EyeMandala {
                 this.dummy.rotation.x = Math.random() * Math.PI;
                 this.dummy.rotation.y = Math.random() * Math.PI;
 
-                // Larger scales
-                const scale = 0.6 + Math.random() * 0.8; // (was 0.4 + 0.6)
+                // Varied Scale
+                const scale = 0.6 + Math.random() * 0.8;
                 this.dummy.scale.set(scale, scale, scale);
 
                 this.dummy.updateMatrix();

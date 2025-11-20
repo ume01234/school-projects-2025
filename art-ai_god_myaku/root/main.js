@@ -9,7 +9,7 @@ scene.background = new THREE.Color(0x050000);
 scene.fog = new THREE.FogExp2(0x050000, 0.02);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.z = 8; // Closer (was 12)
+camera.position.z = 5;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -32,10 +32,16 @@ window.addEventListener('mousemove', (event) => {
 });
 
 window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    postProcess.setSize(window.innerWidth, window.innerHeight);
+
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    postProcess.setSize(width, height);
 });
 
 // --- Animation Loop ---
