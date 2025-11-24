@@ -1,7 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sample HTML Page</title>
+    <title>Game AI Project</title>
+    <style>
+        body {
+            background-color: #0d1117; /* GitHubっぽいダークモード背景 */
+            color: #58a6ff;            /* 文字色 */
+            font-family: 'Courier New', monospace; /* プログラミングフォント */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 { margin-bottom: 10px; }
+        .status { color: #3fb950; font-weight: bold; } /* 緑色 */
+        
+        /* クルクル回るアニメーション（CSSの動作確認用） */
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #30363d;
+            border-top: 5px solid #58a6ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-top: 30px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>GAME AI PROJECT</h1>
+    <p>Vercel Deployment: <span class="status">ONLINE</span></p>
+    <p>現在、環境構築テスト中です。</p>
+    <div class="loader"></div>
+
+    <script>
+        // JSの動作確認用ログ
+        console.log("System initialized. JavaScript is working perfectly.");
+    </script>
+</body>
 </html>
