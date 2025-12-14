@@ -179,32 +179,35 @@ let flowerRenderer = null
 // =============================================
 // スタンドアロンで使用する場合のsetup/draw
 // 外部から呼び出す場合は使用しない
+// FLOWER_STANDALONE を true に設定すると有効化
 // =============================================
-function setup() {
-	createCanvas(windowWidth, windowHeight)
-	
-	flowerRenderer = new FlowerRenderer()
-	flowerRenderer.init()
-}
-
-function windowResized() {
-	resizeCanvas(windowWidth, windowHeight)
-	if (flowerRenderer) {
-		flowerRenderer.resize()
+if (typeof FLOWER_STANDALONE !== 'undefined' && FLOWER_STANDALONE) {
+	window.setup = function() {
+		createCanvas(windowWidth, windowHeight)
+		
+		flowerRenderer = new FlowerRenderer()
+		flowerRenderer.init()
 	}
-}
 
-function draw() {
-	blendMode(BLEND)
-	fill(255)
-	noStroke()
-	rect(0, 0, width, height)
-	
-	flowerRenderer.draw()
-}
+	window.windowResized = function() {
+		resizeCanvas(windowWidth, windowHeight)
+		if (flowerRenderer) {
+			flowerRenderer.resize()
+		}
+	}
 
-function mouseClicked() {
-	if (flowerRenderer) {
-		flowerRenderer.reset()
+	window.draw = function() {
+		blendMode(BLEND)
+		fill(255)
+		noStroke()
+		rect(0, 0, width, height)
+		
+		flowerRenderer.draw()
+	}
+
+	window.mouseClicked = function() {
+		if (flowerRenderer) {
+			flowerRenderer.reset()
+		}
 	}
 }

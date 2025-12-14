@@ -117,19 +117,22 @@ let eyeRenderer = null;
 // =============================================
 // スタンドアロンで使用する場合のsetup/draw
 // 外部から呼び出す場合は使用しない
+// EYE_STANDALONE を true に設定すると有効化
 // =============================================
-function setup() {
-	createCanvas(1112, 834, WEBGL);
-	mouseX = width / 2;
-	mouseY = height / 2;
-	
-	eyeRenderer = new EyeRenderer();
-	eyeRenderer.init();
-}
+if (typeof EYE_STANDALONE !== 'undefined' && EYE_STANDALONE) {
+	window.setup = function() {
+		createCanvas(1112, 834, WEBGL);
+		mouseX = width / 2;
+		mouseY = height / 2;
+		
+		eyeRenderer = new EyeRenderer();
+		eyeRenderer.init();
+	};
 
-function draw() {
-	background('#002D52');
-	eyeRenderer.draw();
+	window.draw = function() {
+		background('#002D52');
+		eyeRenderer.draw();
+	};
 }
 
 
@@ -200,6 +203,8 @@ class Eye
 		rotateX(angleX + PI / 2);
 		
 		this.drawTex();
+		// シェーダーをpush()の後に設定（push/popでシェーダー状態がリセットされるため）
+		shader(this.shader);
 		this.shader.setUniform("u_tex", this.tex);
 		sphere(this.radius);
 		pop();
