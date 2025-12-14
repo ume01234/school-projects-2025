@@ -39,8 +39,8 @@ class EyeFlower {
 			count: 0,
 			groupSize: 0,
 			groupsCount: 0,
-			darks: ['#04996d', '#4467ab'],
-			lights: ['#99dfff', '#60ebca', '#c4f5ed', '#b8ccfc'],
+			darks: ['#04996d', '#C71585'],  // 緑とピンク
+			lights: ['#60ebca', '#90EE90', '#FFB6C1', '#FF69B4'],  // 緑系とピンク系
 			petalSpeed: 0.0005,
 			rotation: 0,
 			ranges: {
