@@ -1,7 +1,11 @@
 # 参照/参考資料まとめ
 
+https://openprocessing.org/discover/#/trending
+Open Processingサイト
 
 
+https://editor.p5js.org/
+p5.js webエディタ
 
 https://openprocessing.org/sketch/1288521
 リアルな眼球
@@ -31,5 +35,9 @@ NFT展示会のニュース記事
 
 https://musely.ai/ja/tools/kaleidoscope-pattern-generator
 mesely AI万華鏡ジェネレーター
+
+https://openprocessing.org/sketch/2268475
+華に使えそう
+
 
 
