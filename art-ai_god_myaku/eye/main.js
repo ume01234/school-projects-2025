@@ -25,8 +25,8 @@ function windowResized() {
 }
 
 function draw() {
-	// 背景（深い青緑）
-	background('#0a1628');
+	// 背景（ミャクミャクの赤）
+	background('#CC0000');
 	
 	// 目と華を描画
 	eyeFlower.draw();

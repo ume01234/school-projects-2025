@@ -164,18 +164,21 @@ class Eye
 	{
 		this.tex.ellipseMode(CENTER);
 		this.tex.noStroke();
-		this.tex.background("#F4F8FB");		
+		this.tex.background("#F4F8FB");  // 白い強膜
 		let diameter = this.tex.width * 0.2;
 		let noiseMult = noise(this.pos.x + sin((frameCount / CYCLE) * TWO_PI));
 		diameter += (noiseMult - 0.5) / 5 * diameter;
-		this.tex.fill(100);
+		
+		// 虹彩の外側（濃い青）
+		this.tex.fill("#1A2A4D");
 		this.tex.ellipse(this.tex.width / 2, this.tex.height / 2, diameter, diameter);
 		
+		// 放射状の虹彩パターン（明るい水色系の青でコントラストを出す）
 		this.tex.push();
 		this.tex.translate(this.tex.width / 2, this.tex.height / 2);
 		for(let r = 0; r < TWO_PI; r += PI / 30)
 		{
-			this.tex.stroke("#72dD72AA");
+			this.tex.stroke("#5599DDCC");
 			this.tex.push();
 			this.tex.rotate(r);
 			this.tex.line(0, 0, diameter / 2, 0);
@@ -184,9 +187,12 @@ class Eye
 		this.tex.pop();
 		this.tex.noStroke();
 		
+		// 瞳孔（ミャクミャクの青）
 		diameter *= 0.5;
-		this.tex.fill("#001223");
+		this.tex.fill("#0066DD");
 		this.tex.ellipse(this.tex.width / 2, this.tex.height / 2, diameter, diameter);
+		
+		// ハイライト
 		diameter *= 0.5;
 		this.tex.fill(255, 100);
 		this.tex.ellipse(this.tex.width * 0.55, this.tex.height * 0.4, diameter, diameter);
