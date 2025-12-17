@@ -7,7 +7,12 @@ class EyeFlower {
 	constructor() {
 		// 位置とスケール
 		this.position = { x: 0, y: 0 };
+		this.basePosition = { x: 0, y: 0 };
 		this.scale = 1.0;
+		this.useFloat = true;            // 浮遊アニメーションを使うか
+		this.positionOverride = null;    // 外部から一時的に位置を指定
+		this.flowerOffset = { x: 0, y: 0, z: 0 }; // 花のオフセット
+		this.eyeOffset = { x: 0, y: 0, z: 0 };    // 目のオフセット
 		
 		// 浮遊アニメーション用
 		this.noiseOffsetX = random(1000);
@@ -64,6 +69,7 @@ class EyeFlower {
 	init(options = {}) {
 		this.scale = options.scale || 1.0;
 		this.position = options.position || { x: width / 2, y: height / 2 };
+		this.basePosition = { ...this.position };
 		
 		// サイズ設定
 		this.eyeSize = min(width, height) * 0.3 * this.scale;
@@ -98,6 +104,10 @@ class EyeFlower {
 		// 浮遊範囲を設定
 		this.floatRangeX = width * 0.3;
 		this.floatRangeY = height * 0.25;
+		this.useFloat = true;
+		this.positionOverride = null;
+		this.flowerOffset = { x: 0, y: 0, z: 0 };
+		this.eyeOffset = { x: 0, y: 0, z: 0 };
 		
 		this.initialized = true;
 	}
@@ -253,8 +263,14 @@ class EyeFlower {
 	update() {
 		if (!this.initialized) return;
 		
-		// 浮遊位置を更新
-		this.position = this.calculateFloatPosition();
+		if (this.positionOverride) {
+			this.position = { ...this.positionOverride };
+			this.positionOverride = null; // 毎フレームリセット
+		} else if (this.useFloat) {
+			this.position = this.calculateFloatPosition();
+		} else {
+			this.position = { ...this.basePosition };
+		}
 	}
 	
 	// 描画
@@ -272,10 +288,10 @@ class EyeFlower {
 		imageMode(CENTER);
 		
 		// 花を描画
-		image(this.flowerGraphics, this.position.x, this.position.y);
+		image(this.flowerGraphics, this.position.x + this.flowerOffset.x, this.position.y + this.flowerOffset.y);
 		
 		// 目を上に重ねて描画
-		image(this.eyeGraphics, this.position.x, this.position.y);
+		image(this.eyeGraphics, this.position.x + this.eyeOffset.x, this.position.y + this.eyeOffset.y);
 		
 		pop();
 	}
@@ -289,6 +305,7 @@ class EyeFlower {
 	// 位置を設定
 	setPosition(x, y) {
 		this.position = { x, y };
+		this.basePosition = { x, y };
 	}
 	
 	// スケールを設定
@@ -306,5 +323,32 @@ class EyeFlower {
 	// 視線の動きの速度を設定
 	setGazeSpeed(speed) {
 		this.gazeNoiseSpeed = speed;
+	}
+
+	// 浮遊オン/オフ
+	setFloatEnabled(flag) {
+		this.useFloat = flag;
+	}
+
+	// 浮遊範囲を調整
+	setFloatRange(rx, ry) {
+		this.floatRangeX = rx;
+		this.floatRangeY = ry;
+	}
+
+	// ベース位置を設定
+	setBasePosition(x, y) {
+		this.basePosition = { x, y };
+	}
+
+	// 1フレーム限定で位置を上書き（更新後に自動クリア）
+	setPositionOverride(x, y) {
+		this.positionOverride = { x, y };
+	}
+
+	// 花・目それぞれのオフセットを設定
+	setOffsets(flowerOffset, eyeOffset) {
+		if (flowerOffset) this.flowerOffset = { ...flowerOffset };
+		if (eyeOffset) this.eyeOffset = { ...eyeOffset };
 	}
 }
