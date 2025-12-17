@@ -2,6 +2,7 @@
 // 目と華 - メインスケッチ
 // 2Dモードで描画（目と花は内部で別々にレンダリング）
 // 状態管理: FAR / MIDDLE / NEAR
+// インタラクション: カメラで顔を検出し、距離と位置に応じて状態遷移
 // =============================================
 
 const STATE_FAR = 'FAR';
@@ -15,11 +16,32 @@ const THRESH_MIDDLE = 0.66;
 // デバッグ表示（距離と状態を表示）
 const DEBUG_OVERLAY = true;
 
+// デモモード（顔検出なしでテスト用のサイン波を使用）
+const DEMO_MODE = false;
+
 let eyeFlower;
 let cornerEyes = [];
 let currentState = STATE_FAR;
 let targetState = STATE_FAR; // 将来の遷移アニメーション用
-let mockDistance = 1.0; // センサー入力の代替
+let currentDistance = 1.0; // 顔との距離（0〜1、小さいほど近い）
+
+// 顔検出関連
+let video;
+let faceMesh;
+let faces = [];
+let faceDetected = false;
+let lastFaceTime = 0;
+const FACE_TIMEOUT = 2000; // 顔が検出されなくなってからFARに戻るまでの時間(ms)
+
+// 観客位置（顔の位置から計算）
+let viewerPosition = { x: 0, y: 0 };
+// 視線ターゲット（スムーズな追従用）
+let gazeTarget = { x: 0, y: 0 };
+const GAZE_SMOOTHING = 0.08; // 視線追従の滑らかさ（小さいほど遅延）
+
+// 顔サイズから距離を推定するためのパラメータ
+const FACE_SIZE_NEAR = 200;  // 顔がこのサイズ以上なら「近い」
+const FACE_SIZE_FAR = 50;    // 顔がこのサイズ以下なら「遠い」
 
 // NEAR状態用
 let backgroundFlowers = [];
@@ -30,6 +52,9 @@ function setup() {
 	// 2Dモードでキャンバス作成（合成用）
 	createCanvas(windowWidth, windowHeight);
 	
+	// カメラキャプチャを初期化
+	initCamera();
+	
 	// 目と華のセットを作成
 	eyeFlower = new EyeFlower();
 	eyeFlower.init({
@@ -38,6 +63,47 @@ function setup() {
 
 	initCornerEyes();
 	initNearState();
+}
+
+// --------------------------------------------------
+// カメラと顔検出の初期化
+// --------------------------------------------------
+function initCamera() {
+	// ビデオキャプチャを作成（非表示）
+	video = createCapture(VIDEO, onCameraReady);
+	video.size(640, 480);
+	video.hide();
+}
+
+function onCameraReady() {
+	console.log('Camera ready');
+	
+	// ml5.js FaceMeshを初期化
+	const options = {
+		maxFaces: 1,
+		refineLandmarks: false,
+		flipped: true
+	};
+	
+	faceMesh = ml5.faceMesh(options, onFaceMeshReady);
+}
+
+function onFaceMeshReady() {
+	console.log('FaceMesh model loaded');
+	// 顔検出を開始
+	faceMesh.detectStart(video, onFacesDetected);
+}
+
+function onFacesDetected(results) {
+	faces = results;
+	if (faces.length > 0) {
+		faceDetected = true;
+		lastFaceTime = millis();
+		// デバッグ: 顔検出結果をコンソールに出力（最初の1回だけ）
+		if (frameCount < 10) {
+			console.log('Face detected:', faces[0]);
+		}
+	}
 }
 
 function windowResized() {
@@ -56,6 +122,9 @@ function draw() {
 	
 	// 距離の擬似入力を更新し、状態を決定
 	updateDistanceAndState();
+	
+	// 観客位置を更新（マウス位置で代用）
+	updateViewerPosition();
 	
 	// 状態に応じて描画
 	if (currentState === STATE_FAR) {
@@ -83,15 +152,115 @@ function keyPressed() {
 // 状態判定ロジック（1箇所に集約）
 // --------------------------------------------------
 function updateDistanceAndState() {
-	// ダミー距離: サイン波で 0〜1 を行き来
-	mockDistance = map(sin(frameCount * 0.01), -1, 1, 0, 1);
+	if (DEMO_MODE) {
+		// デモモード: サイン波で状態を循環
+		currentDistance = map(sin(frameCount * 0.01), -1, 1, 0, 1);
+	} else {
+		// カメラモード: 顔検出から距離を計算
+		currentDistance = calculateDistanceFromFace();
+	}
 	
-	targetState = getStateFromDistance(mockDistance);
+	targetState = getStateFromDistance(currentDistance);
 	
 	// 将来的に遷移アニメーションを入れられるよう、
 	// currentState と targetState を分離しているが、
 	// 今は即時反映する。
 	currentState = targetState;
+}
+
+// 顔のサイズから距離を計算（0〜1、小さいほど近い）
+function calculateDistanceFromFace() {
+	// 顔が検出されていない場合
+	if (!faceDetected || faces.length === 0) {
+		// タイムアウトチェック
+		if (millis() - lastFaceTime > FACE_TIMEOUT) {
+			faceDetected = false;
+			return 1.0; // 最も遠い
+		}
+		// タイムアウト前は最後の距離を維持（スムーズな遷移のため）
+		return currentDistance;
+	}
+	
+	const face = faces[0];
+	
+	// 顔のバウンディングボックスからサイズを計算
+	let faceSize = 0;
+	if (face.box) {
+		faceSize = max(face.box.width, face.box.height);
+	} else if (face.keypoints && face.keypoints.length > 0) {
+		// keypointsから顔のサイズを推定
+		let minX = Infinity, maxX = -Infinity;
+		let minY = Infinity, maxY = -Infinity;
+		for (let kp of face.keypoints) {
+			minX = min(minX, kp.x);
+			maxX = max(maxX, kp.x);
+			minY = min(minY, kp.y);
+			maxY = max(maxY, kp.y);
+		}
+		faceSize = max(maxX - minX, maxY - minY);
+	}
+	
+	// 顔サイズを距離に変換（大きい顔 = 近い = 小さい値）
+	// FACE_SIZE_NEAR以上 → 0（近い）
+	// FACE_SIZE_FAR以下 → 1（遠い）
+	const distance = map(faceSize, FACE_SIZE_FAR, FACE_SIZE_NEAR, 1.0, 0.0);
+	return constrain(distance, 0.0, 1.0);
+}
+
+// --------------------------------------------------
+// 観客位置の更新（顔の位置から計算）
+// --------------------------------------------------
+function updateViewerPosition() {
+	if (DEMO_MODE) {
+		// デモモード: マウス位置を使用
+		viewerPosition.x = mouseX;
+		viewerPosition.y = mouseY;
+	} else if (faceDetected && faces.length > 0) {
+		// カメラモード: 顔の中心位置を使用
+		const face = faces[0];
+		let faceX = 0, faceY = 0;
+		
+		// keypointsから顔の中心を計算（FaceMeshは主にkeypointsを返す）
+		if (face.keypoints && face.keypoints.length > 0) {
+			// 顔の中心を計算（全keypointsの平均）
+			let sumX = 0, sumY = 0;
+			for (let kp of face.keypoints) {
+				sumX += kp.x;
+				sumY += kp.y;
+			}
+			faceX = sumX / face.keypoints.length;
+			faceY = sumY / face.keypoints.length;
+		} else if (face.box) {
+			// バウンディングボックスの中心（フォールバック）
+			const box = face.box;
+			faceX = (box.xMin || box.x || 0) + (box.width || 0) / 2;
+			faceY = (box.yMin || box.y || 0) + (box.height || 0) / 2;
+		}
+		
+		// ビデオ座標をキャンバス座標に変換
+		// カメラはミラー反転されているため、X座標を反転
+		viewerPosition.x = map(faceX, 0, video.width, width, 0); // X反転
+		viewerPosition.y = map(faceY, 0, video.height, 0, height);
+	}
+	// 顔が検出されていない場合は最後の位置を維持
+	
+	// スムーズな視線追従（遅延を入れて自然な動きに）
+	gazeTarget.x += (viewerPosition.x - gazeTarget.x) * GAZE_SMOOTHING;
+	gazeTarget.y += (viewerPosition.y - gazeTarget.y) * GAZE_SMOOTHING;
+}
+
+// 観客位置から3D視線ターゲットを計算
+function calculateGazeTarget3D() {
+	// 画面中央からの相対位置を計算
+	const relX = gazeTarget.x - width / 2;
+	const relY = -(gazeTarget.y - height / 2); // Y軸反転
+	
+	// 視線の範囲を制限しつつ、監視・注視を想起させる動き
+	const gazeRange = 400;
+	const gx = constrain(relX * 1.5, -gazeRange, gazeRange);
+	const gy = constrain(relY * 1.5, -gazeRange, gazeRange);
+	
+	return createVector(gx, gy, 300);
 }
 
 function getStateFromDistance(dist) {
@@ -110,6 +279,11 @@ function drawFarState() {
 	eyeFlower.setFloatEnabled(false);
 	eyeFlower.setOffsets({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
 	eyeFlower.setPositionOverride(cx, cy);
+	
+	// 観客の方向を見る（監視・注視を想起）
+	const gazeTarget = calculateGazeTarget3D();
+	eyeFlower.setGazeTarget(gazeTarget);
+	
 	eyeFlower.draw();
 }
 
@@ -135,9 +309,14 @@ function drawMiddleState() {
 	eyeFlower.setFloatEnabled(false);
 	eyeFlower.setOffsets(flowerOffset, eyeOffset);
 	eyeFlower.setPositionOverride(cx, cy);
+	
+	// 観客の方向を見る（監視・注視を想起）
+	const gazeTarget = calculateGazeTarget3D();
+	eyeFlower.setGazeTarget(gazeTarget);
+	
 	eyeFlower.draw();
 
-	// 四隅の目（視線のみ動かす）
+	// 四隅の目（視線のみ動かす、ランダム）
 	for (let eye of cornerEyes) {
 		eye.update();
 		eye.draw();
@@ -164,7 +343,7 @@ class CornerEye {
 	// setup後に呼び出す（createGraphicsはsetup後でないと動作しないため）
 	init() {
 		// 中央の目と同じサイズ構成
-		const graphicsSize = this.eyeSize * 2;
+		const graphicsSize = this.eyeSize * 2.5; // 赤い円用に少し大きく
 		this.graphicsSize = graphicsSize;
 		this.gfx = createGraphics(graphicsSize, graphicsSize, WEBGL);
 		const dep = graphicsSize;
@@ -176,8 +355,8 @@ class CornerEye {
 		this.shader.setUniform("u_lightDir", [1, -1, -1]);
 
 		// 中央の目と同じeyeRadius（eyeSize * 0.4）
-		const eyeRadius = this.eyeSize * 0.4;
-		this.eye = new Eye(createVector(0, 0, 0), eyeRadius, this.shader);
+		this.eyeRadius = this.eyeSize * 0.4;
+		this.eye = new Eye(createVector(0, 0, 0), this.eyeRadius, this.shader);
 		this.initialized = true;
 	}
 
@@ -199,6 +378,15 @@ class CornerEye {
 		g.clear();
 		g.noStroke();
 
+		// 赤い円を描画（うねらない綺麗な円）
+		g.push();
+		g.resetShader();
+		g.fill('#FF2222'); // ミャクミャクらしいビビッドな赤
+		g.noStroke();
+		g.ellipse(0, 0, this.eyeRadius * 3.2, this.eyeRadius * 3.2);
+		g.pop();
+
+		// 目を描画
 		g.push();
 		let angleY = atan2(this.eye.currentTarget.x - this.eye.pos.x, this.eye.currentTarget.z - this.eye.pos.z);
 		let angleX = atan2(this.eye.currentTarget.z - this.eye.pos.z, this.eye.currentTarget.y - this.eye.pos.y);
@@ -636,6 +824,11 @@ function initNearState() {
 function drawNearState() {
 	if (!nearStateInitialized) return;
 	
+	// 「近い」状態では視線追従をオフ（eyeFlowerは使用しないが念のため）
+	if (eyeFlower) {
+		eyeFlower.clearGazeTarget();
+	}
+	
 	// 背景の蓮華を描画
 	for (let flower of backgroundFlowers) {
 		flower.display();
@@ -711,10 +904,27 @@ function drawDebugOverlay() {
 	noStroke();
 	textSize(16);
 	textAlign(LEFT, TOP);
+	
+	const mode = DEMO_MODE ? 'DEMO' : 'CAMERA';
+	const faceStatus = faceDetected ? 'detected' : 'not detected';
+	
 	const lines = [
-		`distance: ${mockDistance.toFixed(2)}`,
+		`mode: ${mode}`,
+		`distance: ${currentDistance.toFixed(2)}`,
 		`state: ${currentState}`
 	];
+	
+	// カメラモードの場合は顔検出状態を表示
+	if (!DEMO_MODE) {
+		lines.push(`face: ${faceStatus}`);
+		lines.push(`viewer: (${viewerPosition.x.toFixed(0)}, ${viewerPosition.y.toFixed(0)})`);
+	}
+	
+	// 視線追従の情報（FAR/MIDDLE状態のみ）
+	if (currentState === STATE_FAR || currentState === STATE_MIDDLE) {
+		lines.push(`gaze: (${gazeTarget.x.toFixed(0)}, ${gazeTarget.y.toFixed(0)})`);
+	}
+	
 	if (currentState === STATE_NEAR) {
 		lines.push(`creatures: ${redEyeCreatures.filter(c => !c.isAbsorbed).length}`);
 	}

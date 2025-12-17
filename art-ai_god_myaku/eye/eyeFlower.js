@@ -27,6 +27,10 @@ class EyeFlower {
 		this.gazeNoiseSpeed = 0.008;
 		this.gazeRange = 300;
 		
+		// 外部からの視線ターゲット（観客追従用）
+		this.externalGazeTarget = null; // nullの場合はランダム視線を使用
+		this.useExternalGaze = false;
+		
 		// 目専用のWEBGLグラフィックス
 		this.eyeGraphics = null;
 		this.eyeSize = 0;
@@ -73,7 +77,7 @@ class EyeFlower {
 		
 		// サイズ設定
 		this.eyeSize = min(width, height) * 0.3 * this.scale;
-		this.flowerSize = this.eyeSize * 2;
+		this.flowerSize = this.eyeSize * 2.5; // 華を少し大きく
 		
 		// 目専用のWEBGLグラフィックスを作成
 		let eyeGraphicsSize = this.eyeSize * 2;
@@ -168,8 +172,13 @@ class EyeFlower {
 		eg.background(0, 0, 0, 0); // 透明背景
 		eg.noStroke();
 		
-		// 視線を更新
-		let gaze = this.calculateRandomGaze();
+		// 視線を更新（外部ターゲットがあればそれを使用、なければランダム）
+		let gaze;
+		if (this.useExternalGaze && this.externalGazeTarget) {
+			gaze = this.externalGazeTarget;
+		} else {
+			gaze = this.calculateRandomGaze();
+		}
 		this.eye.setTarget(gaze);
 		this.eye.update();
 		
@@ -350,5 +359,17 @@ class EyeFlower {
 	setOffsets(flowerOffset, eyeOffset) {
 		if (flowerOffset) this.flowerOffset = { ...flowerOffset };
 		if (eyeOffset) this.eyeOffset = { ...eyeOffset };
+	}
+	
+	// 外部から視線ターゲットを設定（観客追従用）
+	setGazeTarget(target) {
+		this.externalGazeTarget = target;
+		this.useExternalGaze = true;
+	}
+	
+	// 視線ターゲットをクリア（ランダム視線に戻す）
+	clearGazeTarget() {
+		this.externalGazeTarget = null;
+		this.useExternalGaze = false;
 	}
 }
