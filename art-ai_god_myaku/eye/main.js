@@ -37,7 +37,9 @@ const FACE_TIMEOUT = 2000; // 顔が検出されなくなってからFARに戻�
 let viewerPosition = { x: 0, y: 0 };
 // 視線ターゲット（スムーズな追従用）
 let gazeTarget = { x: 0, y: 0 };
-const GAZE_SMOOTHING = 0.08; // 視線追従の滑らかさ（小さいほど遅延）
+// 視線追従の滑らかさ（小さいほど遅延）
+const GAZE_SMOOTHING_NORMAL = 0.08;  // 通常の追従速度（MIDDLE状態）
+const GAZE_SMOOTHING_SLOW = 0.015;   // 遅い追従速度（FAR状態：無関心・無執着の表現）
 
 // 顔サイズから距離を推定するためのパラメータ
 const FACE_SIZE_NEAR = 200;  // 顔がこのサイズ以上なら「近い」
@@ -48,12 +50,53 @@ let backgroundFlowers = [];
 let redEyeCreatures = [];
 let nearStateInitialized = false;
 
+// --------------------------------------------------
+// 音声関連
+// --------------------------------------------------
+// 音源ファイルパス（assets/sounds/配下に配置予定）
+const SOUND_PATH_FAR = '../assets/sounds/sound_far.mp3';
+const SOUND_PATH_MIDDLE = '../assets/sounds/sound_middle.mp3';
+const SOUND_PATH_NEAR = '../assets/sounds/sound_near.mp3';
+
+// 音声を有効にするかどうか
+const SOUND_ENABLED = true;
+
+// 音声オブジェクト
+let soundFar = null;
+let soundMiddle = null;
+let soundNear = null;
+let soundsLoaded = false;
+let previousState = null; // 状態変化を検出するため
+
+function preload() {
+	// 音声が有効な場合のみロード
+	if (SOUND_ENABLED) {
+		soundFar = loadSound(SOUND_PATH_FAR, 
+			() => console.log('Sound FAR loaded'),
+			(err) => console.warn('Sound FAR not found:', err)
+		);
+		soundMiddle = loadSound(SOUND_PATH_MIDDLE,
+			() => console.log('Sound MIDDLE loaded'),
+			(err) => console.warn('Sound MIDDLE not found:', err)
+		);
+		soundNear = loadSound(SOUND_PATH_NEAR,
+			() => console.log('Sound NEAR loaded'),
+			(err) => console.warn('Sound NEAR not found:', err)
+		);
+	}
+}
+
 function setup() {
 	// 2Dモードでキャンバス作成（合成用）
 	createCanvas(windowWidth, windowHeight);
 	
 	// カメラキャプチャを初期化
 	initCamera();
+	
+	// 音声の初期化
+	if (SOUND_ENABLED) {
+		soundsLoaded = true;
+	}
 	
 	// 目と華のセットを作成
 	eyeFlower = new EyeFlower();
@@ -166,6 +209,60 @@ function updateDistanceAndState() {
 	// currentState と targetState を分離しているが、
 	// 今は即時反映する。
 	currentState = targetState;
+	
+	// 状態が変わったら音声を切り替える
+	if (currentState !== previousState) {
+		onStateChanged(previousState, currentState);
+		previousState = currentState;
+	}
+}
+
+// --------------------------------------------------
+// 音声制御
+// --------------------------------------------------
+function onStateChanged(oldState, newState) {
+	if (!SOUND_ENABLED || !soundsLoaded) return;
+	
+	// 前の状態の音声を停止
+	stopAllSounds();
+	
+	// 新しい状態の音声を再生
+	playStateSound(newState);
+}
+
+function stopAllSounds() {
+	if (soundFar && soundFar.isPlaying()) soundFar.stop();
+	if (soundMiddle && soundMiddle.isPlaying()) soundMiddle.stop();
+	if (soundNear && soundNear.isPlaying()) soundNear.stop();
+}
+
+function playStateSound(state) {
+	if (!SOUND_ENABLED) return;
+	
+	let sound = null;
+	switch (state) {
+		case STATE_FAR:
+			sound = soundFar;
+			break;
+		case STATE_MIDDLE:
+			sound = soundMiddle;
+			break;
+		case STATE_NEAR:
+			sound = soundNear;
+			break;
+	}
+	
+	if (sound && sound.isLoaded()) {
+		sound.setLoop(true); // ループ再生
+		sound.play();
+	}
+}
+
+// 音声を開始するためのユーザーインタラクション（ブラウザの自動再生ポリシー対応）
+function mousePressed() {
+	if (SOUND_ENABLED && getAudioContext().state !== 'running') {
+		getAudioContext().resume();
+	}
 }
 
 // 顔のサイズから距離を計算（0〜1、小さいほど近い）
@@ -245,8 +342,10 @@ function updateViewerPosition() {
 	// 顔が検出されていない場合は最後の位置を維持
 	
 	// スムーズな視線追従（遅延を入れて自然な動きに）
-	gazeTarget.x += (viewerPosition.x - gazeTarget.x) * GAZE_SMOOTHING;
-	gazeTarget.y += (viewerPosition.y - gazeTarget.y) * GAZE_SMOOTHING;
+	// FAR状態では無関心・無執着を表現するため、追従速度を遅くする
+	const smoothing = (currentState === STATE_FAR) ? GAZE_SMOOTHING_SLOW : GAZE_SMOOTHING_NORMAL;
+	gazeTarget.x += (viewerPosition.x - gazeTarget.x) * smoothing;
+	gazeTarget.y += (viewerPosition.y - gazeTarget.y) * smoothing;
 }
 
 // 観客位置から3D視線ターゲットを計算
