@@ -1,0 +1,106 @@
+.game-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background-color: #161b22;
+  border-radius: 8px;
+  border: 1px solid #30363d;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.turn-indicator {
+  text-align: center;
+}
+
+.turn-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.turn-display.black {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: #fff;
+}
+
+.turn-display.white {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.turn-piece {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.turn-piece.black {
+  background: radial-gradient(circle at 30% 30%, #4a4a4a, #000000);
+}
+
+.turn-piece.white {
+  background: radial-gradient(circle at 30% 30%, #ffffff, #d0d0d0);
+}
+
+.score-display {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.score-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.score-piece {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.score-piece.black {
+  background: radial-gradient(circle at 30% 30%, #4a4a4a, #000000);
+}
+
+.score-piece.white {
+  background: radial-gradient(circle at 30% 30%, #ffffff, #d0d0d0);
+}
+
+.score-label {
+  font-weight: 600;
+  color: #8b949e;
+}
+
+.score-value {
+  font-weight: 700;
+  color: #58a6ff;
+  font-size: 1.25rem;
+}
+
+.pass-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background-color: #21262d;
+  color: #f0883e;
+  border: 1px solid #f0883e;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pass-button:hover {
+  background-color: #f0883e;
+  color: #0d1117;
+}

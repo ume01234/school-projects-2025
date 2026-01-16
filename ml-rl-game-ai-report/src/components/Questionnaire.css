@@ -1,0 +1,136 @@
+.questionnaire {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #161b22;
+  border-radius: 12px;
+  border: 2px solid #30363d;
+}
+
+.questionnaire h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #58a6ff;
+  text-align: center;
+}
+
+.questionnaire-description {
+  text-align: center;
+  color: #8b949e;
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: #c9d1d9;
+  font-size: 1.05rem;
+}
+
+.text-input,
+.textarea-input {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #c9d1d9;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.text-input:focus,
+.textarea-input:focus {
+  outline: none;
+  border-color: #58a6ff;
+}
+
+.textarea-input {
+  resize: vertical;
+}
+
+.scale-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #8b949e;
+}
+
+.range-input {
+  width: 100%;
+  height: 6px;
+  background: #30363d;
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #58a6ff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.range-input::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #58a6ff;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.scale-value {
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #58a6ff;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: #238636;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #2ea043;
+}
+
+.btn-secondary {
+  background-color: #21262d;
+  color: #8b949e;
+  border: 1px solid #30363d;
+}
+
+.btn-secondary:hover {
+  background-color: #30363d;
+  color: #c9d1d9;
+}

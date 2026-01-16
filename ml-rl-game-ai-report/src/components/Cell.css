@@ -1,0 +1,45 @@
+.cell {
+  width: 100%;
+  aspect-ratio: 1;
+  background-color: #2d8659;
+  border: 1px solid #1a5235;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: default;
+  transition: background-color 0.2s;
+}
+
+.cell.valid-move {
+  cursor: pointer;
+  background-color: #3a9d6e;
+}
+
+.cell.valid-move:hover {
+  background-color: #48b37e;
+}
+
+.piece {
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.piece.black {
+  background: radial-gradient(circle at 30% 30%, #4a4a4a, #000000);
+}
+
+.piece.white {
+  background: radial-gradient(circle at 30% 30%, #ffffff, #d0d0d0);
+}
+
+.move-marker {
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  position: absolute;
+}
