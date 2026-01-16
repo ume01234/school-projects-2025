@@ -7,6 +7,7 @@ import Questionnaire, { QuestionnaireData } from './components/Questionnaire';
 import { createInitialBoard, getValidMoves, makeMove, calculateScore, checkGameOver, getWinner } from './game/othelloLogic';
 import { getRandomMove } from './game/randomAI';
 import { generateGameId, saveGameLog, saveQuestionnaire } from './firebase/firestore';
+import { generateVisibilityMap, getModeTitleJapanese } from './game/visibilityUtils';
 import type { GameMode, GameState, Move, GameLog } from './game/types';
 import './App.css';
 
@@ -27,6 +28,7 @@ function App() {
   const [isAiThinking, setIsAiThinking] = useState(false);
   const [gameId, setGameId] = useState<string>('');
   const [gameStartTime, setGameStartTime] = useState<number>(0);
+  const [visibilityMap, setVisibilityMap] = useState<boolean[][] | null>(null);
 
   // ゲーム開始
   const handleModeSelect = (mode: GameMode) => {
@@ -47,6 +49,10 @@ function App() {
       isGameOver: false,
       winner: null
     });
+
+    // 可視性マップを生成
+    const visibility = generateVisibilityMap(mode);
+    setVisibilityMap(visibility);
 
     setViewState('playing');
   };
@@ -204,7 +210,7 @@ function App() {
 
       {viewState === 'playing' && (
         <div className="game-screen">
-          <h1 className="game-title">オセロ - 通常モード</h1>
+          <h1 className="game-title">{getModeTitleJapanese(selectedMode)}</h1>
 
           <GameInfo
             currentPlayer={gameState.currentPlayer}
@@ -219,6 +225,8 @@ function App() {
               validMoves={gameState.validMoves}
               onCellClick={handleCellClick}
               disabled={gameState.currentPlayer === 'white' || isAiThinking}
+              mode={selectedMode}
+              visibilityMap={visibilityMap}
             />
             {isAiThinking && (
               <div className="ai-thinking">AIが考え中...</div>

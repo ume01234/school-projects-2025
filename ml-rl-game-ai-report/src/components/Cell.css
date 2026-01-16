@@ -44,3 +44,12 @@
   border: 2px solid rgba(255, 255, 255, 0.6);
   position: absolute;
 }
+
+.cell.hidden-cell {
+  background-color: #1f5c3f;
+  opacity: 0.6;
+}
+
+.cell.hidden-cell:hover {
+  background-color: #1f5c3f;
+}

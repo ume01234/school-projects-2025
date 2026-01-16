@@ -23,19 +23,19 @@ const modes: ModeInfo[] = [
     mode: 'blindfold1',
     title: '目隠しオセロ（軽度）',
     description: '盤面の一部が見えません',
-    available: false
+    available: true
   },
   {
     mode: 'blindfold2',
     title: '目隠しオセロ（中程度）',
     description: '盤面の半分が見えません',
-    available: false
+    available: true
   },
   {
     mode: 'blindfold3',
     title: '目隠しオセロ（重度）',
     description: '合法手のみ表示されます',
-    available: false
+    available: true
   },
   {
     mode: 'strong-ai',
