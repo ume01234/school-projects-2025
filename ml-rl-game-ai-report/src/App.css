@@ -57,6 +57,25 @@
   }
 }
 
+.quit-button {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 2px solid var(--bg-tertiary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quit-button:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--text-tertiary);
+}
+
 @media (max-width: 768px) {
   .app {
     padding: 1rem;

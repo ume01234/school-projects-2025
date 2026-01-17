@@ -202,6 +202,11 @@ function App() {
     setViewState('mode-select');
   };
 
+  // 対戦を中断してホームに戻る
+  const handleQuitGame = () => {
+    setViewState('mode-select');
+  };
+
   return (
     <div className="app">
       {viewState === 'mode-select' && (
@@ -234,6 +239,10 @@ function App() {
               <div className="ai-thinking">AIが考え中...</div>
             )}
           </div>
+
+          <button className="quit-button" onClick={handleQuitGame}>
+            中断してホームに戻る
+          </button>
         </div>
       )}
 
