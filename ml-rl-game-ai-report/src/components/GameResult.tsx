@@ -1,14 +1,16 @@
-import type { Player } from '../game/types';
+import type { Player, Board as BoardType } from '../game/types';
+import Board from './Board';
 import './GameResult.css';
 
 interface GameResultProps {
   winner: Player | 'draw';
   score: { black: number; white: number };
+  finalBoard: BoardType;
   onShowQuestionnaire: () => void;
   onPlayAgain: () => void;
 }
 
-function GameResult({ winner, score, onShowQuestionnaire, onPlayAgain }: GameResultProps) {
+function GameResult({ winner, score, finalBoard, onShowQuestionnaire, onPlayAgain }: GameResultProps) {
   const getResultMessage = () => {
     if (winner === 'draw') return '引き分け！';
     if (winner === 'black') return '黒の勝利！';
@@ -43,12 +45,26 @@ function GameResult({ winner, score, onShowQuestionnaire, onPlayAgain }: GameRes
         </div>
       </div>
 
+      <div className="final-board">
+        <h3>最終盤面</h3>
+        <div className="final-board-container">
+          <Board
+            board={finalBoard}
+            validMoves={[]}
+            onCellClick={() => {}}
+            disabled={true}
+            mode="normal"
+            visibilityMap={null}
+          />
+        </div>
+      </div>
+
       <div className="result-actions">
         <button className="btn btn-primary" onClick={onShowQuestionnaire}>
           アンケートに答える
         </button>
         <button className="btn btn-secondary" onClick={onPlayAgain}>
-          もう一度プレイ
+          ホームに戻る
         </button>
       </div>
     </div>

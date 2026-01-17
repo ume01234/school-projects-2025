@@ -3,14 +3,30 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #0d1117;
+  color-scheme: light;
+  color: #212529;
+  background: linear-gradient(135deg, #e8f5f3 0%, #f8f9fa 100%);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* アクセントカラー */
+  --accent-primary: #00897B;
+  --accent-light: #26a69a;
+  --accent-lighter: #80cbc4;
+  --accent-dark: #00695c;
+
+  /* 背景色 */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+
+  /* テキスト色 */
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --text-tertiary: #6c757d;
 }
 
 * {
@@ -41,13 +57,16 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--accent-primary);
+  color: #ffffff;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.25s;
 }
 
 button:hover {
-  border-color: #646cff;
+  background-color: var(--accent-light);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 137, 123, 0.3);
 }
 
 button:focus,

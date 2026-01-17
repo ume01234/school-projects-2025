@@ -8,14 +8,22 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
   align-items: center;
+}
+
+.game-header {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .game-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #58a6ff;
+  color: var(--accent-primary);
   text-align: center;
   margin: 0;
 }
@@ -30,12 +38,13 @@
 
 .ai-thinking {
   font-size: 1.1rem;
-  color: #f0883e;
+  color: var(--accent-dark);
   font-weight: 600;
   padding: 0.75rem 1.5rem;
-  background-color: #21262d;
-  border: 1px solid #f0883e;
-  border-radius: 6px;
+  background-color: var(--bg-primary);
+  border: 2px solid var(--accent-primary);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 137, 123, 0.2);
   animation: pulse 1.5s ease-in-out infinite;
 }
 

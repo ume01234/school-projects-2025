@@ -1,10 +1,11 @@
 .game-result {
-  max-width: 500px;
+  max-width: 700px;
   margin: 0 auto;
   padding: 2rem;
-  background-color: #161b22;
+  background-color: var(--bg-primary);
   border-radius: 12px;
-  border: 2px solid #30363d;
+  border: 2px solid var(--bg-tertiary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
@@ -21,24 +22,24 @@
 }
 
 .result-message.black {
-  background-color: rgba(0, 0, 0, 0.3);
-  color: #fff;
+  background: linear-gradient(135deg, #495057 0%, #212529 100%);
+  color: #ffffff;
 }
 
 .result-message.white {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  background: linear-gradient(135deg, var(--accent-lighter) 0%, var(--accent-light) 100%);
+  color: #ffffff;
 }
 
 .result-message.draw {
-  background-color: rgba(139, 148, 158, 0.2);
-  color: #8b949e;
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+  color: var(--text-primary);
 }
 
 .final-score h3 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
-  color: #8b949e;
+  color: var(--text-secondary);
 }
 
 .score-row {
@@ -73,19 +74,35 @@
 .score-label {
   font-weight: 600;
   font-size: 1.2rem;
-  color: #8b949e;
+  color: var(--text-secondary);
 }
 
 .score-value {
   font-weight: 700;
   font-size: 2rem;
-  color: #58a6ff;
+  color: var(--accent-primary);
 }
 
 .score-separator {
   font-size: 2rem;
-  color: #30363d;
+  color: var(--bg-tertiary);
   font-weight: 300;
+}
+
+.final-board {
+  margin: 2rem 0;
+}
+
+.final-board h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+}
+
+.final-board-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
 }
 
 .result-actions {
@@ -105,21 +122,21 @@
 }
 
 .btn-primary {
-  background-color: #238636;
+  background-color: var(--accent-primary);
   color: #fff;
 }
 
 .btn-primary:hover {
-  background-color: #2ea043;
+  background-color: var(--accent-light);
 }
 
 .btn-secondary {
-  background-color: #21262d;
-  color: #58a6ff;
-  border: 1px solid #58a6ff;
+  background-color: var(--bg-primary);
+  color: var(--accent-primary);
+  border: 2px solid var(--accent-primary);
 }
 
 .btn-secondary:hover {
-  background-color: #58a6ff;
-  color: #0d1117;
+  background-color: var(--accent-primary);
+  color: #ffffff;
 }

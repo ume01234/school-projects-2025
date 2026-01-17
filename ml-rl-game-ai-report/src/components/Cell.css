@@ -1,24 +1,25 @@
 .cell {
   width: 12.5%;
   aspect-ratio: 1;
-  background-color: #2d8659;
-  border: 1px solid #1a5235;
+  background-color: var(--accent-primary);
+  border: 1px solid var(--accent-dark);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   cursor: default;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
   flex-shrink: 0;
 }
 
 .cell.valid-move {
   cursor: pointer;
-  background-color: #3a9d6e;
+  background-color: var(--accent-light);
 }
 
 .cell.valid-move:hover {
-  background-color: #48b37e;
+  background-color: var(--accent-lighter);
+  transform: scale(0.95);
 }
 
 .piece {
@@ -46,10 +47,10 @@
 }
 
 .cell.hidden-cell {
-  background-color: #1f5c3f;
-  opacity: 0.6;
+  background-color: var(--accent-dark);
+  opacity: 0.7;
 }
 
 .cell.hidden-cell:hover {
-  background-color: #1f5c3f;
+  background-color: var(--accent-dark);
 }

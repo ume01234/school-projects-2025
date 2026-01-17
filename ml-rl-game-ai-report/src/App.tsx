@@ -210,14 +210,16 @@ function App() {
 
       {viewState === 'playing' && (
         <div className="game-screen">
-          <h1 className="game-title">{getModeTitleJapanese(selectedMode)}</h1>
+          <div className="game-header">
+            <h1 className="game-title">{getModeTitleJapanese(selectedMode)}</h1>
 
-          <GameInfo
-            currentPlayer={gameState.currentPlayer}
-            score={gameState.score}
-            canPass={gameState.validMoves.length === 0 && gameState.currentPlayer === 'black'}
-            onPass={handlePass}
-          />
+            <GameInfo
+              currentPlayer={gameState.currentPlayer}
+              score={gameState.score}
+              canPass={gameState.validMoves.length === 0 && gameState.currentPlayer === 'black'}
+              onPass={handlePass}
+            />
+          </div>
 
           <div className="board-container">
             <Board
@@ -239,6 +241,7 @@ function App() {
         <GameResult
           winner={gameState.winner || 'draw'}
           score={gameState.score}
+          finalBoard={gameState.board}
           onShowQuestionnaire={handleShowQuestionnaire}
           onPlayAgain={handlePlayAgain}
         />
