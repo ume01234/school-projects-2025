@@ -141,7 +141,7 @@ function App() {
         // AIもパス
         setTimeout(() => {
           handlePass();
-        }, 500);
+        }, 2000);
         return;
       }
 
@@ -150,7 +150,7 @@ function App() {
         const aiMove = getRandomMove(gameState.validMoves);
         executeMove(aiMove);
         setIsAiThinking(false);
-      }, 500);
+      }, 2000);
     }
   }, [gameState.currentPlayer, viewState, gameState.isGameOver, isAiThinking]);
 
