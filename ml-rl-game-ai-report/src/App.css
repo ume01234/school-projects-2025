@@ -4,20 +4,8 @@
 }
 
 .game-screen {
-  max-width: 700px;
+  max-width: 1100px;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: center;
-}
-
-.game-header {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1rem;
 }
 
 .game-title {
@@ -25,15 +13,25 @@
   font-weight: 700;
   color: var(--accent-primary);
   text-align: center;
-  margin: 0;
+  margin: 0 0 2rem 0;
+}
+
+.game-content {
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.game-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 280px;
 }
 
 .board-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+  flex-shrink: 0;
 }
 
 .ai-thinking {
@@ -45,20 +43,16 @@
   border: 2px solid var(--accent-primary);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 137, 123, 0.2);
+  text-align: center;
   animation: pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
 .quit-button {
-  margin-top: 1.5rem;
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
   font-weight: 600;
@@ -76,21 +70,26 @@
   border-color: var(--text-tertiary);
 }
 
+@media (max-width: 900px) {
+  .game-content {
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+
+  .game-sidebar {
+    width: 100%;
+    max-width: 500px;
+    min-width: auto;
+  }
+}
+
 @media (max-width: 768px) {
   .app {
     padding: 1rem;
   }
 
-  .game-screen {
-    gap: 1.5rem;
-  }
-
   .game-title {
     font-size: 1.5rem;
-  }
-
-  .board {
-    width: 100%;
-    max-width: 400px;
+    margin-bottom: 1.5rem;
   }
 }

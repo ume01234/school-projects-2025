@@ -175,31 +175,33 @@ function App() {
 
       {viewState === 'playing' && (
         <div className="game-screen">
-          <div className="game-header">
-            <h1 className="game-title">{getModeTitleJapanese(selectedMode)}</h1>
-            <GameInfo
-              currentPlayer={gameState.currentPlayer}
-              score={gameState.score}
-              canPass={gameState.validMoves.length === 0 && gameState.currentPlayer === 'black'}
-              onPass={handlePass}
-            />
-          </div>
+          <h1 className="game-title">{getModeTitleJapanese(selectedMode)}</h1>
 
-          <div className="board-container">
-            <Board
-              board={gameState.board}
-              onCellClick={handleCellClick}
-              disabled={gameState.currentPlayer === 'white' || isAiThinking}
-              mode={selectedMode}
-              visibilityMap={visibilityMap}
-              lastAiMove={lastAiMove}
-            />
-            {isAiThinking && <div className="ai-thinking">AIが考え中...</div>}
-          </div>
+          <div className="game-content">
+            <div className="game-sidebar">
+              <GameInfo
+                currentPlayer={gameState.currentPlayer}
+                score={gameState.score}
+                canPass={gameState.validMoves.length === 0 && gameState.currentPlayer === 'black'}
+                onPass={handlePass}
+              />
+              {isAiThinking && <div className="ai-thinking">AIが考え中...</div>}
+              <button className="quit-button" onClick={() => setViewState('mode-select')}>
+                中断してホームに戻る
+              </button>
+            </div>
 
-          <button className="quit-button" onClick={() => setViewState('mode-select')}>
-            中断してホームに戻る
-          </button>
+            <div className="board-container">
+              <Board
+                board={gameState.board}
+                onCellClick={handleCellClick}
+                disabled={gameState.currentPlayer === 'white' || isAiThinking}
+                mode={selectedMode}
+                visibilityMap={visibilityMap}
+                lastAiMove={lastAiMove}
+              />
+            </div>
+          </div>
         </div>
       )}
 
