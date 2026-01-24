@@ -23,10 +23,12 @@ function GameInfo({ currentPlayer, score, canPass, onPass, mode, showMiss }: Gam
         <h3 className="rules-title">ルール</h3>
         <ul className="rules-list">
           <li>黒（先攻）があなたです</li>
+          <li>初期配置は常に同じです</li>
           <li>{modeRules[mode]}</li>
           <li>合法手は表示されません</li>
           <li>置けない場所に置くとパスになります</li>
           <li>AIの手は赤枠で表示されます</li>
+          <li>AIはランダムに手を選びます</li>
         </ul>
       </div>
 
