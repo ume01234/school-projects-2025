@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ModeSelector from './components/ModeSelector';
 import Board from './components/Board';
 import GameInfo from './components/GameInfo';
@@ -26,8 +26,16 @@ function App() {
   const [visibilityMap, setVisibilityMap] = useState<boolean[][] | null>(null);
   const [lastAiMove, setLastAiMove] = useState<{ row: number; col: number } | null>(null);
   const [showMiss, setShowMiss] = useState(false);
+  const aiTimerRef = useRef<number | null>(null);
 
   const startGame = (mode: GameMode) => {
+    // タイマーをクリア
+    if (aiTimerRef.current !== null) {
+      clearTimeout(aiTimerRef.current);
+      aiTimerRef.current = null;
+    }
+    setIsAiThinking(false);
+
     setSelectedMode(mode);
 
     const initialBoard = createInitialBoard();
@@ -107,18 +115,25 @@ function App() {
 
   // AIの手番処理
   useEffect(() => {
+    // 既にタイマーが動いている場合は何もしない
+    if (aiTimerRef.current !== null) {
+      return;
+    }
+
     if (
       viewState !== 'playing' ||
       gameState.currentPlayer !== 'white' ||
-      gameState.isGameOver ||
-      isAiThinking
+      gameState.isGameOver
     ) {
       return;
     }
 
-    if (gameState.validMoves.length === 0) {
+    const validMoves = gameState.validMoves;
+
+    if (validMoves.length === 0) {
       // AIがパスする場合
-      const timer = setTimeout(() => {
+      aiTimerRef.current = window.setTimeout(() => {
+        aiTimerRef.current = null;
         setGameState(prev => {
           const blackValidMoves = getValidMoves(prev.board, 'black');
           if (blackValidMoves.length === 0) {
@@ -127,13 +142,14 @@ function App() {
           return { ...prev, currentPlayer: 'black', validMoves: blackValidMoves };
         });
       }, 2000);
-      return () => clearTimeout(timer);
+      return;
     }
 
     setIsAiThinking(true);
-    const aiMove = getRandomMove(gameState.validMoves);
+    const aiMove = getRandomMove(validMoves);
 
-    const timer = setTimeout(() => {
+    aiTimerRef.current = window.setTimeout(() => {
+      aiTimerRef.current = null;
       setGameState(prev => {
         const { board: newBoard } = makeMove(prev.board, aiMove, 'white');
         const newScore = calculateScore(newBoard);
@@ -150,9 +166,7 @@ function App() {
       setLastAiMove(aiMove);
       setIsAiThinking(false);
     }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [gameState, viewState, isAiThinking]);
+  }, [gameState.currentPlayer, gameState.isGameOver, gameState.validMoves, viewState]);
 
   // ゲーム終了時の処理
   useEffect(() => {
@@ -182,8 +196,15 @@ function App() {
                 showMiss={showMiss}
               />
               {isAiThinking && <div className="ai-thinking">AIが考え中...</div>}
-              <button className="quit-button" onClick={() => setViewState('mode-select')}>
-                中断してホームに戻る
+              <button className="quit-button" onClick={() => {
+                if (aiTimerRef.current !== null) {
+                  clearTimeout(aiTimerRef.current);
+                  aiTimerRef.current = null;
+                }
+                setIsAiThinking(false);
+                setViewState('mode-select');
+              }}>
+                ホームに戻る
               </button>
             </div>
 
