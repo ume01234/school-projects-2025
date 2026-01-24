@@ -22,6 +22,7 @@ function GameInfo({ currentPlayer, score, canPass, onPass, mode, showMiss }: Gam
       <div className="rules-section">
         <h3 className="rules-title">ルール</h3>
         <ul className="rules-list">
+          <li>黒（先攻）があなたです</li>
           <li>{modeRules[mode]}</li>
           <li>合法手は表示されません</li>
           <li>置けない場所に置くとパスになります</li>
