@@ -55,6 +55,7 @@ function GameResult({ winner, score, finalBoard, onShowQuestionnaire, onPlayAgai
             disabled={true}
             mode="normal"
             visibilityMap={null}
+            lastAiMove={null}
           />
         </div>
       </div>

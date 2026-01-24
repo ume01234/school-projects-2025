@@ -36,18 +36,6 @@ const modes: ModeInfo[] = [
     title: '目隠しオセロ（重度）',
     description: '合法手のみ表示されます',
     available: true
-  },
-  {
-    mode: 'strong-ai',
-    title: '最強AIモード',
-    description: '強化学習AIと対戦',
-    available: false
-  },
-  {
-    mode: 'hospitality-ai',
-    title: '接待AIモード',
-    description: '接戦を目指すAIと対戦',
-    available: false
   }
 ];
 

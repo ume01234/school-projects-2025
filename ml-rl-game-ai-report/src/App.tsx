@@ -29,6 +29,7 @@ function App() {
   const [gameId, setGameId] = useState<string>('');
   const [gameStartTime, setGameStartTime] = useState<number>(0);
   const [visibilityMap, setVisibilityMap] = useState<boolean[][] | null>(null);
+  const [lastAiMove, setLastAiMove] = useState<{ row: number; col: number } | null>(null);
 
   // ゲーム開始
   const handleModeSelect = (mode: GameMode) => {
@@ -53,6 +54,9 @@ function App() {
     // 可視性マップを生成
     const visibility = generateVisibilityMap(mode);
     setVisibilityMap(visibility);
+
+    // AIの最後の手をリセット
+    setLastAiMove(null);
 
     setViewState('playing');
   };
@@ -149,6 +153,7 @@ function App() {
       setTimeout(() => {
         const aiMove = getRandomMove(gameState.validMoves);
         executeMove(aiMove);
+        setLastAiMove(aiMove);
         setIsAiThinking(false);
       }, 2000);
     }
@@ -234,6 +239,7 @@ function App() {
               disabled={gameState.currentPlayer === 'white' || isAiThinking}
               mode={selectedMode}
               visibilityMap={visibilityMap}
+              lastAiMove={lastAiMove}
             />
             {isAiThinking && (
               <div className="ai-thinking">AIが考え中...</div>

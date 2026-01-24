@@ -7,9 +7,10 @@ interface CellProps {
   onClick: () => void;
   isVisible: boolean;
   mode: GameMode;
+  isLastAiMove: boolean;
 }
 
-function Cell({ player, isValidMove, onClick, isVisible, mode }: CellProps) {
+function Cell({ player, isValidMove, onClick, isVisible, mode, isLastAiMove }: CellProps) {
   // 石を表示するかどうか判定
   const shouldShowPiece = () => {
     if (!player) return false;
@@ -20,7 +21,7 @@ function Cell({ player, isValidMove, onClick, isVisible, mode }: CellProps) {
 
   return (
     <div
-      className={`cell ${isValidMove ? 'valid-move' : ''} ${!isVisible ? 'hidden-cell' : ''}`}
+      className={`cell ${isValidMove ? 'valid-move' : ''} ${!isVisible ? 'hidden-cell' : ''} ${isLastAiMove ? 'last-ai-move' : ''}`}
       onClick={isValidMove ? onClick : undefined}
     >
       {shouldShowPiece() && (

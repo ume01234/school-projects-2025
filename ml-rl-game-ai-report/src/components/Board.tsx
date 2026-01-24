@@ -9,9 +9,10 @@ interface BoardProps {
   disabled?: boolean;
   mode: GameMode;
   visibilityMap: boolean[][] | null;
+  lastAiMove: { row: number; col: number } | null;
 }
 
-function Board({ board, validMoves, onCellClick, disabled = false, mode, visibilityMap }: BoardProps) {
+function Board({ board, validMoves, onCellClick, disabled = false, mode, visibilityMap, lastAiMove }: BoardProps) {
   const isValidMove = (row: number, col: number): boolean => {
     return validMoves.some(move => move.row === row && move.col === col);
   };
@@ -20,6 +21,12 @@ function Board({ board, validMoves, onCellClick, disabled = false, mode, visibil
   const isCellVisible = (row: number, col: number): boolean => {
     if (visibilityMap === null) return true; // 通常モード
     return visibilityMap[row][col];
+  };
+
+  // AIの最後の手かどうか判定
+  const isLastAiMove = (row: number, col: number): boolean => {
+    if (!lastAiMove) return false;
+    return lastAiMove.row === row && lastAiMove.col === col;
   };
 
   return (
@@ -34,6 +41,7 @@ function Board({ board, validMoves, onCellClick, disabled = false, mode, visibil
               onClick={() => onCellClick({ row: rowIndex, col: colIndex })}
               isVisible={isCellVisible(rowIndex, colIndex)}
               mode={mode}
+              isLastAiMove={isLastAiMove(rowIndex, colIndex)}
             />
           ))}
         </div>

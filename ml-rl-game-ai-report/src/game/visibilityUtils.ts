@@ -71,9 +71,7 @@ export function getModeTitleJapanese(mode: GameMode): string {
     'normal': 'オセロ - 通常モード',
     'blindfold1': 'オセロ - 目隠しモード（軽度）',
     'blindfold2': 'オセロ - 目隠しモード（中程度）',
-    'blindfold3': 'オセロ - 目隠しモード（重度）',
-    'strong-ai': 'オセロ - 最強AIモード',
-    'hospitality-ai': 'オセロ - 接待AIモード'
+    'blindfold3': 'オセロ - 目隠しモード（重度）'
   };
   return titles[mode];
 }

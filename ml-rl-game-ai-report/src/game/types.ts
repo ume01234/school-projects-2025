@@ -1,7 +1,7 @@
 export type Player = 'black' | 'white' | null;
 export type Board = Player[][];
 export type Position = { row: number; col: number };
-export type GameMode = 'normal' | 'blindfold1' | 'blindfold2' | 'blindfold3' | 'strong-ai' | 'hospitality-ai';
+export type GameMode = 'normal' | 'blindfold1' | 'blindfold2' | 'blindfold3';
 export type GamePhase = 'mode-select' | 'playing' | 'result';
 
 export interface GameState {
