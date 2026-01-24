@@ -9,6 +9,34 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+.rules-section {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.rules-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem 0;
+}
+
+.rules-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.rules-list li {
+  margin-bottom: 0.25rem;
+}
+
+.rules-list li:last-child {
+  margin-bottom: 0;
+}
+
 .turn-indicator {
   text-align: center;
 }

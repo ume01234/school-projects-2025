@@ -184,6 +184,7 @@ function App() {
                 score={gameState.score}
                 canPass={gameState.validMoves.length === 0 && gameState.currentPlayer === 'black'}
                 onPass={handlePass}
+                mode={selectedMode}
               />
               {isAiThinking && <div className="ai-thinking">AIが考え中...</div>}
               <button className="quit-button" onClick={() => setViewState('mode-select')}>

@@ -1,4 +1,4 @@
-import type { Player } from '../game/types';
+import type { Player, GameMode } from '../game/types';
 import './GameInfo.css';
 
 interface GameInfoProps {
@@ -6,11 +6,28 @@ interface GameInfoProps {
   score: { black: number; white: number };
   canPass: boolean;
   onPass: () => void;
+  mode: GameMode;
 }
 
-function GameInfo({ currentPlayer, score, canPass, onPass }: GameInfoProps) {
+const modeRules: Record<GameMode, string> = {
+  'blindfold1': '外周が見えません',
+  'blindfold2': '盤面の半分がランダムに見えません',
+  'blindfold3': '中央4マス以外見えません'
+};
+
+function GameInfo({ currentPlayer, score, canPass, onPass, mode }: GameInfoProps) {
   return (
     <div className="game-info">
+      <div className="rules-section">
+        <h3 className="rules-title">ルール</h3>
+        <ul className="rules-list">
+          <li>{modeRules[mode]}</li>
+          <li>合法手は表示されません</li>
+          <li>置けない場所に置くとパスになります</li>
+          <li>AIの手は赤枠で表示されます</li>
+        </ul>
+      </div>
+
       <div className="turn-indicator">
         <div className={`turn-display ${currentPlayer}`}>
           <div className={`turn-piece ${currentPlayer}`}></div>
