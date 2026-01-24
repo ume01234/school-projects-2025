@@ -67,43 +67,41 @@ function App() {
   };
 
   const executeMove = (position: { row: number; col: number }) => {
-    const { board: newBoard } = makeMove(
-      gameState.board,
-      position,
-      gameState.currentPlayer
-    );
+    setGameState(prev => {
+      const { board: newBoard } = makeMove(prev.board, position, prev.currentPlayer);
+      const newScore = calculateScore(newBoard);
+      const isOver = checkGameOver(newBoard);
+      const opponent = prev.currentPlayer === 'black' ? 'white' : 'black';
 
-    const newScore = calculateScore(newBoard);
-    const isOver = checkGameOver(newBoard);
-    const opponent = gameState.currentPlayer === 'black' ? 'white' : 'black';
-
-    setGameState({
-      board: newBoard,
-      currentPlayer: opponent,
-      validMoves: getValidMoves(newBoard, opponent),
-      score: newScore,
-      isGameOver: isOver,
-      winner: isOver ? getWinner(newScore) : null
+      return {
+        board: newBoard,
+        currentPlayer: opponent,
+        validMoves: getValidMoves(newBoard, opponent),
+        score: newScore,
+        isGameOver: isOver,
+        winner: isOver ? getWinner(newScore) : null
+      };
     });
   };
 
   const handlePass = () => {
-    const opponent = gameState.currentPlayer === 'black' ? 'white' : 'black';
-    const opponentValidMoves = getValidMoves(gameState.board, opponent);
+    setGameState(prev => {
+      const opponent = prev.currentPlayer === 'black' ? 'white' : 'black';
+      const opponentValidMoves = getValidMoves(prev.board, opponent);
 
-    if (opponentValidMoves.length === 0) {
-      setGameState({
-        ...gameState,
-        isGameOver: true,
-        winner: getWinner(gameState.score)
-      });
-      return;
-    }
+      if (opponentValidMoves.length === 0) {
+        return {
+          ...prev,
+          isGameOver: true,
+          winner: getWinner(prev.score)
+        };
+      }
 
-    setGameState({
-      ...gameState,
-      currentPlayer: opponent,
-      validMoves: opponentValidMoves
+      return {
+        ...prev,
+        currentPlayer: opponent,
+        validMoves: opponentValidMoves
+      };
     });
   };
 
@@ -119,25 +117,49 @@ function App() {
     }
 
     if (gameState.validMoves.length === 0) {
-      setTimeout(handlePass, 2000);
-      return;
+      // AIがパスする場合
+      const timer = setTimeout(() => {
+        setGameState(prev => {
+          const blackValidMoves = getValidMoves(prev.board, 'black');
+          if (blackValidMoves.length === 0) {
+            return { ...prev, isGameOver: true, winner: getWinner(prev.score) };
+          }
+          return { ...prev, currentPlayer: 'black', validMoves: blackValidMoves };
+        });
+      }, 2000);
+      return () => clearTimeout(timer);
     }
 
     setIsAiThinking(true);
-    setTimeout(() => {
-      const aiMove = getRandomMove(gameState.validMoves);
-      executeMove(aiMove);
+    const aiMove = getRandomMove(gameState.validMoves);
+
+    const timer = setTimeout(() => {
+      setGameState(prev => {
+        const { board: newBoard } = makeMove(prev.board, aiMove, 'white');
+        const newScore = calculateScore(newBoard);
+        const isOver = checkGameOver(newBoard);
+        return {
+          board: newBoard,
+          currentPlayer: 'black',
+          validMoves: getValidMoves(newBoard, 'black'),
+          score: newScore,
+          isGameOver: isOver,
+          winner: isOver ? getWinner(newScore) : null
+        };
+      });
       setLastAiMove(aiMove);
       setIsAiThinking(false);
     }, 2000);
-  }, [gameState.currentPlayer, viewState, gameState.isGameOver, isAiThinking]);
+
+    return () => clearTimeout(timer);
+  }, [gameState, viewState, isAiThinking]);
 
   // ゲーム終了時の処理
   useEffect(() => {
     if (gameState.isGameOver && viewState === 'playing') {
       setViewState('result');
     }
-  }, [gameState.isGameOver]);
+  }, [gameState.isGameOver, viewState]);
 
   return (
     <div className="app">
