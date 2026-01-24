@@ -33,20 +33,13 @@
   cursor: pointer;
   transition: all 0.3s;
   text-align: left;
-  position: relative;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.mode-card:not(.disabled):hover {
+.mode-card:hover {
   border-color: var(--accent-primary);
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(0, 137, 123, 0.25);
-}
-
-.mode-card.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  border-color: var(--bg-tertiary);
 }
 
 .mode-title {
@@ -60,19 +53,7 @@
   font-size: 0.95rem;
   color: var(--text-secondary);
   line-height: 1.5;
-  margin-bottom: 0.5rem;
-}
-
-.coming-soon {
-  display: inline-block;
-  margin-top: 0.75rem;
-  padding: 0.25rem 0.75rem;
-  background-color: var(--bg-tertiary);
-  color: var(--accent-dark);
-  border: 1px solid var(--accent-primary);
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  margin: 0;
 }
 
 @media (max-width: 768px) {

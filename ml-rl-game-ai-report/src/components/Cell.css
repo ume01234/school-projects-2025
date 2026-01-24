@@ -6,20 +6,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
   cursor: default;
   transition: all 0.2s;
   flex-shrink: 0;
 }
 
-.cell.valid-move {
+.cell.clickable {
   cursor: pointer;
-  background-color: var(--accent-light);
 }
 
-.cell.valid-move:hover {
-  background-color: var(--accent-lighter);
+.cell.clickable:hover {
+  background-color: var(--accent-light);
   transform: scale(0.95);
+}
+
+.cell.hidden-cell {
+  background-color: var(--accent-dark);
+  opacity: 0.7;
+}
+
+.cell.last-ai-move {
+  box-shadow: inset 0 0 0 3px #e74c3c;
+  z-index: 1;
 }
 
 .piece {
@@ -35,36 +43,4 @@
 
 .piece.white {
   background: radial-gradient(circle at 30% 30%, #ffffff, #d0d0d0);
-}
-
-.move-marker {
-  width: 30%;
-  height: 30%;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.4);
-  border: 2px solid rgba(255, 255, 255, 0.6);
-  position: absolute;
-}
-
-.cell.hidden-cell {
-  background-color: var(--accent-dark);
-  opacity: 0.7;
-}
-
-.cell.hidden-cell:hover {
-  background-color: var(--accent-dark);
-}
-
-.cell.last-ai-move {
-  box-shadow: inset 0 0 0 3px #e74c3c;
-  z-index: 1;
-}
-
-.cell.clickable {
-  cursor: pointer;
-}
-
-.cell.clickable:hover {
-  background-color: var(--accent-light);
-  transform: scale(0.95);
 }

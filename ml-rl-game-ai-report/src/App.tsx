@@ -15,7 +15,7 @@ type ViewState = 'mode-select' | 'playing' | 'result' | 'questionnaire';
 
 function App() {
   const [viewState, setViewState] = useState<ViewState>('mode-select');
-  const [selectedMode, setSelectedMode] = useState<GameMode>('normal');
+  const [selectedMode, setSelectedMode] = useState<GameMode>('blindfold1');
   const [gameState, setGameState] = useState<GameState>({
     board: createInitialBoard(),
     currentPlayer: 'black',
@@ -26,67 +26,50 @@ function App() {
     winner: null
   });
   const [isAiThinking, setIsAiThinking] = useState(false);
-  const [gameId, setGameId] = useState<string>('');
-  const [gameStartTime, setGameStartTime] = useState<number>(0);
+  const [gameId, setGameId] = useState('');
+  const [gameStartTime, setGameStartTime] = useState(0);
   const [visibilityMap, setVisibilityMap] = useState<boolean[][] | null>(null);
   const [lastAiMove, setLastAiMove] = useState<{ row: number; col: number } | null>(null);
 
-  // ゲーム開始
-  const handleModeSelect = (mode: GameMode) => {
+  const startGame = (mode: GameMode) => {
     setSelectedMode(mode);
-    const newGameId = generateGameId();
-    setGameId(newGameId);
+    setGameId(generateGameId());
     setGameStartTime(Date.now());
 
     const initialBoard = createInitialBoard();
-    const validMoves = getValidMoves(initialBoard, 'black');
-
     setGameState({
       board: initialBoard,
       currentPlayer: 'black',
-      validMoves,
+      validMoves: getValidMoves(initialBoard, 'black'),
       score: calculateScore(initialBoard),
       moveHistory: [],
       isGameOver: false,
       winner: null
     });
 
-    // 可視性マップを生成
-    const visibility = generateVisibilityMap(mode);
-    setVisibilityMap(visibility);
-
-    // AIの最後の手をリセット
+    setVisibilityMap(generateVisibilityMap(mode));
     setLastAiMove(null);
-
     setViewState('playing');
   };
 
-  // 目隠しモードかどうか
-  const isBlindfoldMode = selectedMode !== 'normal';
-
-  // セルクリックハンドラ
   const handleCellClick = (position: { row: number; col: number }) => {
     if (gameState.isGameOver || gameState.currentPlayer !== 'black' || isAiThinking) {
       return;
     }
 
-    // 合法手かチェック
     const isValid = gameState.validMoves.some(
       (move) => move.row === position.row && move.col === position.col
     );
 
     if (!isValid) {
-      if (isBlindfoldMode) {
-        // 目隠しモード: 不正な手はパス扱い
-        handlePass();
-      }
+      // 不正な手はパス扱い
+      handlePass();
       return;
     }
 
     executeMove(position);
   };
 
-  // 手を実行
   const executeMove = (position: { row: number; col: number }) => {
     const { board: newBoard, capturedCount } = makeMove(
       gameState.board,
@@ -105,12 +88,11 @@ function App() {
     const newScore = calculateScore(newBoard);
     const isOver = checkGameOver(newBoard);
     const opponent = gameState.currentPlayer === 'black' ? 'white' : 'black';
-    const opponentValidMoves = getValidMoves(newBoard, opponent);
 
     setGameState({
       board: newBoard,
       currentPlayer: opponent,
-      validMoves: opponentValidMoves,
+      validMoves: getValidMoves(newBoard, opponent),
       score: newScore,
       moveHistory: newMoveHistory,
       isGameOver: isOver,
@@ -118,12 +100,10 @@ function App() {
     });
   };
 
-  // パス処理
   const handlePass = () => {
     const opponent = gameState.currentPlayer === 'black' ? 'white' : 'black';
     const opponentValidMoves = getValidMoves(gameState.board, opponent);
 
-    // 相手も合法手がなければゲーム終了
     if (opponentValidMoves.length === 0) {
       setGameState({
         ...gameState,
@@ -143,33 +123,31 @@ function App() {
   // AIの手番処理
   useEffect(() => {
     if (
-      viewState === 'playing' &&
-      gameState.currentPlayer === 'white' &&
-      !gameState.isGameOver &&
-      !isAiThinking
+      viewState !== 'playing' ||
+      gameState.currentPlayer !== 'white' ||
+      gameState.isGameOver ||
+      isAiThinking
     ) {
-      if (gameState.validMoves.length === 0) {
-        // AIもパス
-        setTimeout(() => {
-          handlePass();
-        }, 2000);
-        return;
-      }
-
-      setIsAiThinking(true);
-      setTimeout(() => {
-        const aiMove = getRandomMove(gameState.validMoves);
-        executeMove(aiMove);
-        setLastAiMove(aiMove);
-        setIsAiThinking(false);
-      }, 2000);
+      return;
     }
+
+    if (gameState.validMoves.length === 0) {
+      setTimeout(handlePass, 2000);
+      return;
+    }
+
+    setIsAiThinking(true);
+    setTimeout(() => {
+      const aiMove = getRandomMove(gameState.validMoves);
+      executeMove(aiMove);
+      setLastAiMove(aiMove);
+      setIsAiThinking(false);
+    }, 2000);
   }, [gameState.currentPlayer, viewState, gameState.isGameOver, isAiThinking]);
 
   // ゲーム終了時の処理
   useEffect(() => {
     if (gameState.isGameOver && viewState === 'playing') {
-      // ゲームログを保存
       const gameLog: GameLog = {
         gameId,
         mode: selectedMode,
@@ -179,57 +157,26 @@ function App() {
         finalScore: gameState.score,
         winner: gameState.winner || 'draw'
       };
-
       saveGameLog(gameLog).catch(console.error);
-
       setViewState('result');
     }
   }, [gameState.isGameOver]);
 
-  // アンケート送信
   const handleQuestionnaireSubmit = (data: QuestionnaireData) => {
-    const response = {
-      gameId,
-      ...data
-    };
-
-    saveQuestionnaire(response).catch(console.error);
-
-    // モード選択画面に戻る
-    setViewState('mode-select');
-  };
-
-  // アンケートスキップ
-  const handleQuestionnaireSkip = () => {
-    setViewState('mode-select');
-  };
-
-  // 結果画面からアンケート表示
-  const handleShowQuestionnaire = () => {
-    setViewState('questionnaire');
-  };
-
-  // もう一度プレイ
-  const handlePlayAgain = () => {
-    setViewState('mode-select');
-  };
-
-  // 対戦を中断してホームに戻る
-  const handleQuitGame = () => {
+    saveQuestionnaire({ gameId, ...data }).catch(console.error);
     setViewState('mode-select');
   };
 
   return (
     <div className="app">
       {viewState === 'mode-select' && (
-        <ModeSelector onSelectMode={handleModeSelect} />
+        <ModeSelector onSelectMode={startGame} />
       )}
 
       {viewState === 'playing' && (
         <div className="game-screen">
           <div className="game-header">
             <h1 className="game-title">{getModeTitleJapanese(selectedMode)}</h1>
-
             <GameInfo
               currentPlayer={gameState.currentPlayer}
               score={gameState.score}
@@ -241,19 +188,16 @@ function App() {
           <div className="board-container">
             <Board
               board={gameState.board}
-              validMoves={gameState.validMoves}
               onCellClick={handleCellClick}
               disabled={gameState.currentPlayer === 'white' || isAiThinking}
               mode={selectedMode}
               visibilityMap={visibilityMap}
               lastAiMove={lastAiMove}
             />
-            {isAiThinking && (
-              <div className="ai-thinking">AIが考え中...</div>
-            )}
+            {isAiThinking && <div className="ai-thinking">AIが考え中...</div>}
           </div>
 
-          <button className="quit-button" onClick={handleQuitGame}>
+          <button className="quit-button" onClick={() => setViewState('mode-select')}>
             中断してホームに戻る
           </button>
         </div>
@@ -264,15 +208,15 @@ function App() {
           winner={gameState.winner || 'draw'}
           score={gameState.score}
           finalBoard={gameState.board}
-          onShowQuestionnaire={handleShowQuestionnaire}
-          onPlayAgain={handlePlayAgain}
+          onShowQuestionnaire={() => setViewState('questionnaire')}
+          onPlayAgain={() => setViewState('mode-select')}
         />
       )}
 
       {viewState === 'questionnaire' && (
         <Questionnaire
           onSubmit={handleQuestionnaireSubmit}
-          onSkip={handleQuestionnaireSkip}
+          onSkip={() => setViewState('mode-select')}
         />
       )}
     </div>

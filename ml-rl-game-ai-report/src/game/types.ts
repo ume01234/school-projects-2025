@@ -1,8 +1,7 @@
 export type Player = 'black' | 'white' | null;
 export type Board = Player[][];
 export type Position = { row: number; col: number };
-export type GameMode = 'normal' | 'blindfold1' | 'blindfold2' | 'blindfold3';
-export type GamePhase = 'mode-select' | 'playing' | 'result';
+export type GameMode = 'blindfold1' | 'blindfold2' | 'blindfold3';
 
 export interface GameState {
   board: Board;
@@ -33,11 +32,11 @@ export interface GameLog {
 
 export interface QuestionnaireResponse {
   gameId: string;
-  nickname?: string;       // アンケートで入力（任意）
-  difficulty: number;      // 1-5
-  enjoyment: number;       // 1-5
-  tension: number;         // 1-5
-  frustration: number;     // 1-5
-  playAgain: number;       // 1-5
+  nickname?: string;
+  difficulty: number;
+  enjoyment: number;
+  tension: number;
+  frustration: number;
+  playAgain: number;
   comments?: string;
 }

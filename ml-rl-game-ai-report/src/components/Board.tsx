@@ -4,7 +4,6 @@ import './Board.css';
 
 interface BoardProps {
   board: BoardType;
-  validMoves: Position[];
   onCellClick: (position: Position) => void;
   disabled?: boolean;
   mode: GameMode;
@@ -12,37 +11,16 @@ interface BoardProps {
   lastAiMove: { row: number; col: number } | null;
 }
 
-function Board({ board, validMoves, onCellClick, disabled = false, mode, visibilityMap, lastAiMove }: BoardProps) {
-  // 目隠しモードかどうか
-  const isBlindfoldMode = mode !== 'normal';
+function Board({ board, onCellClick, disabled = false, mode, visibilityMap, lastAiMove }: BoardProps) {
+  const isCellVisible = (row: number, col: number) =>
+    visibilityMap === null || visibilityMap[row][col];
 
-  const isValidMove = (row: number, col: number): boolean => {
-    return validMoves.some(move => move.row === row && move.col === col);
-  };
+  const isLastAiMoveCell = (row: number, col: number) =>
+    lastAiMove?.row === row && lastAiMove?.col === col;
 
-  // セルの可視性判定
-  const isCellVisible = (row: number, col: number): boolean => {
-    if (visibilityMap === null) return true; // 通常モード
-    return visibilityMap[row][col];
-  };
-
-  // AIの最後の手かどうか判定
-  const isLastAiMove = (row: number, col: number): boolean => {
-    if (!lastAiMove) return false;
-    return lastAiMove.row === row && lastAiMove.col === col;
-  };
-
-  // セルがクリック可能かどうか判定
-  const isCellClickable = (row: number, col: number, cell: typeof board[0][0]): boolean => {
-    if (disabled) return false;
-    if (isBlindfoldMode) {
-      // 目隠しモード: 石が置かれていない空のセルならクリック可能
-      return cell === null;
-    } else {
-      // 通常モード: 合法手のみクリック可能
-      return isValidMove(row, col);
-    }
-  };
+  // 空のセルならクリック可能
+  const isCellClickable = (cell: typeof board[0][0]) =>
+    !disabled && cell === null;
 
   return (
     <div className="board">
@@ -52,12 +30,11 @@ function Board({ board, validMoves, onCellClick, disabled = false, mode, visibil
             <Cell
               key={`${rowIndex}-${colIndex}`}
               player={cell}
-              isValidMove={isValidMove(rowIndex, colIndex)}
               onClick={() => onCellClick({ row: rowIndex, col: colIndex })}
               isVisible={isCellVisible(rowIndex, colIndex)}
               mode={mode}
-              isLastAiMove={isLastAiMove(rowIndex, colIndex)}
-              isClickable={isCellClickable(rowIndex, colIndex, cell)}
+              isLastAiMove={isLastAiMoveCell(rowIndex, colIndex)}
+              isClickable={isCellClickable(cell)}
               row={rowIndex}
               col={colIndex}
             />

@@ -1,49 +1,45 @@
 import type { GameMode } from './types';
 
+const BOARD_SIZE = 8;
+
 /**
  * モードに応じた可視性マップを生成
- * @param mode - ゲームモード
- * @returns 可視性マップ (null = 全て可視, boolean[][] = 各セルの可視性)
+ * true = 見える, false = 見えない
+ * blindfold3はnullを返す（Cell側で中央4マスのみ表示を制御）
  */
 export function generateVisibilityMap(mode: GameMode): boolean[][] | null {
-  if (mode === 'normal') return null;
-
-  const map: boolean[][] = Array(8).fill(null).map(() => Array(8).fill(true));
-
   switch (mode) {
     case 'blindfold1':
-      return generateBlindfold1Map(map);
+      return generateEdgeHiddenMap();
     case 'blindfold2':
-      return generateBlindfold2Map(map);
+      return generateRandomHiddenMap();
     case 'blindfold3':
-      return null; // ロジックベースで非表示
-    default:
       return null;
   }
 }
 
 /**
- * blindfold1: 外周のみ非表示（28セル）
+ * blindfold1: 外周を非表示
  */
-function generateBlindfold1Map(map: boolean[][]): boolean[][] {
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      if (row === 0 || row === 7 || col === 0 || col === 7) {
-        map[row][col] = false;
-      }
+function generateEdgeHiddenMap(): boolean[][] {
+  const map: boolean[][] = [];
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    map[row] = [];
+    for (let col = 0; col < BOARD_SIZE; col++) {
+      const isEdge = row === 0 || row === 7 || col === 0 || col === 7;
+      map[row][col] = !isEdge;
     }
   }
   return map;
 }
 
 /**
- * blindfold2: ランダムに50%（32セル）
- * Fisher-Yates シャッフルで均等分布
+ * blindfold2: ランダムに50%を非表示
  */
-function generateBlindfold2Map(map: boolean[][]): boolean[][] {
-  const positions: Array<[number, number]> = [];
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
+function generateRandomHiddenMap(): boolean[][] {
+  const positions: [number, number][] = [];
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    for (let col = 0; col < BOARD_SIZE; col++) {
       positions.push([row, col]);
     }
   }
@@ -54,8 +50,9 @@ function generateBlindfold2Map(map: boolean[][]): boolean[][] {
     [positions[i], positions[j]] = [positions[j], positions[i]];
   }
 
-  // 最初の32セルを非表示（50%）
-  for (let i = 0; i < 32; i++) {
+  const map: boolean[][] = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(true));
+  const hideCount = Math.floor(positions.length / 2);
+  for (let i = 0; i < hideCount; i++) {
     const [row, col] = positions[i];
     map[row][col] = false;
   }
@@ -68,10 +65,9 @@ function generateBlindfold2Map(map: boolean[][]): boolean[][] {
  */
 export function getModeTitleJapanese(mode: GameMode): string {
   const titles: Record<GameMode, string> = {
-    'normal': 'オセロ - 通常モード',
-    'blindfold1': 'オセロ - 目隠しモード（軽度）',
-    'blindfold2': 'オセロ - 目隠しモード（中程度）',
-    'blindfold3': 'オセロ - 目隠しモード（重度）'
+    'blindfold1': '目隠しリバーシ（軽度）',
+    'blindfold2': '目隠しリバーシ（中程度）',
+    'blindfold3': '目隠しリバーシ（重度）'
   };
   return titles[mode];
 }

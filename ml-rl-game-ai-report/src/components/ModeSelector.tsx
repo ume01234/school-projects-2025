@@ -5,37 +5,21 @@ interface ModeSelectorProps {
   onSelectMode: (mode: GameMode) => void;
 }
 
-interface ModeInfo {
-  mode: GameMode;
-  title: string;
-  description: string;
-  available: boolean;
-}
-
-const modes: ModeInfo[] = [
-  {
-    mode: 'normal',
-    title: '通常オセロ',
-    description: 'ランダムAIと対戦します',
-    available: true
-  },
+const modes: { mode: GameMode; title: string; description: string }[] = [
   {
     mode: 'blindfold1',
-    title: '目隠しオセロ（軽度）',
-    description: '盤面の一部が見えません',
-    available: true
+    title: '目隠し（軽度）',
+    description: '外周が見えません'
   },
   {
     mode: 'blindfold2',
-    title: '目隠しオセロ（中程度）',
-    description: '盤面の半分が見えません',
-    available: true
+    title: '目隠し（中程度）',
+    description: '盤面の半分が見えません'
   },
   {
     mode: 'blindfold3',
-    title: '目隠しオセロ（重度）',
-    description: '合法手のみ表示されます',
-    available: true
+    title: '目隠し（重度）',
+    description: '中央4マス以外見えません'
   }
 ];
 
@@ -49,15 +33,11 @@ function ModeSelector({ onSelectMode }: ModeSelectorProps) {
         {modes.map((modeInfo) => (
           <button
             key={modeInfo.mode}
-            className={`mode-card ${!modeInfo.available ? 'disabled' : ''}`}
-            onClick={() => modeInfo.available && onSelectMode(modeInfo.mode)}
-            disabled={!modeInfo.available}
+            className="mode-card"
+            onClick={() => onSelectMode(modeInfo.mode)}
           >
             <h3 className="mode-title">{modeInfo.title}</h3>
             <p className="mode-description">{modeInfo.description}</p>
-            {!modeInfo.available && (
-              <span className="coming-soon">Coming Soon</span>
-            )}
           </button>
         ))}
       </div>

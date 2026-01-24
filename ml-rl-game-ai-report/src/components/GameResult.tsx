@@ -50,10 +50,9 @@ function GameResult({ winner, score, finalBoard, onShowQuestionnaire, onPlayAgai
         <div className="final-board-container">
           <Board
             board={finalBoard}
-            validMoves={[]}
             onCellClick={() => {}}
             disabled={true}
-            mode="normal"
+            mode="blindfold1"
             visibilityMap={null}
             lastAiMove={null}
           />
