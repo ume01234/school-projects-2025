@@ -6,11 +6,10 @@ interface GameResultProps {
   winner: Player | 'draw';
   score: { black: number; white: number };
   finalBoard: BoardType;
-  onShowQuestionnaire: () => void;
   onPlayAgain: () => void;
 }
 
-function GameResult({ winner, score, finalBoard, onShowQuestionnaire, onPlayAgain }: GameResultProps) {
+function GameResult({ winner, score, finalBoard, onPlayAgain }: GameResultProps) {
   const getResultMessage = () => {
     if (winner === 'draw') return '引き分け！';
     if (winner === 'black') return '黒の勝利！';
@@ -60,10 +59,7 @@ function GameResult({ winner, score, finalBoard, onShowQuestionnaire, onPlayAgai
       </div>
 
       <div className="result-actions">
-        <button className="btn btn-primary" onClick={onShowQuestionnaire}>
-          アンケートに答える
-        </button>
-        <button className="btn btn-secondary" onClick={onPlayAgain}>
+        <button className="btn btn-primary" onClick={onPlayAgain}>
           ホームに戻る
         </button>
       </div>

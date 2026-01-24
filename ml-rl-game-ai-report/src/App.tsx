@@ -3,15 +3,13 @@ import ModeSelector from './components/ModeSelector';
 import Board from './components/Board';
 import GameInfo from './components/GameInfo';
 import GameResult from './components/GameResult';
-import Questionnaire, { QuestionnaireData } from './components/Questionnaire';
 import { createInitialBoard, getValidMoves, makeMove, calculateScore, checkGameOver, getWinner } from './game/othelloLogic';
 import { getRandomMove } from './game/randomAI';
-import { generateGameId, saveGameLog, saveQuestionnaire } from './firebase/firestore';
 import { generateVisibilityMap, getModeTitleJapanese } from './game/visibilityUtils';
-import type { GameMode, GameState, Move, GameLog } from './game/types';
+import type { GameMode, GameState } from './game/types';
 import './App.css';
 
-type ViewState = 'mode-select' | 'playing' | 'result' | 'questionnaire';
+type ViewState = 'mode-select' | 'playing' | 'result';
 
 function App() {
   const [viewState, setViewState] = useState<ViewState>('mode-select');
@@ -21,21 +19,16 @@ function App() {
     currentPlayer: 'black',
     validMoves: [],
     score: { black: 2, white: 2 },
-    moveHistory: [],
     isGameOver: false,
     winner: null
   });
   const [isAiThinking, setIsAiThinking] = useState(false);
-  const [gameId, setGameId] = useState('');
-  const [gameStartTime, setGameStartTime] = useState(0);
   const [visibilityMap, setVisibilityMap] = useState<boolean[][] | null>(null);
   const [lastAiMove, setLastAiMove] = useState<{ row: number; col: number } | null>(null);
   const [showMiss, setShowMiss] = useState(false);
 
   const startGame = (mode: GameMode) => {
     setSelectedMode(mode);
-    setGameId(generateGameId());
-    setGameStartTime(Date.now());
 
     const initialBoard = createInitialBoard();
     setGameState({
@@ -43,7 +36,6 @@ function App() {
       currentPlayer: 'black',
       validMoves: getValidMoves(initialBoard, 'black'),
       score: calculateScore(initialBoard),
-      moveHistory: [],
       isGameOver: false,
       winner: null
     });
@@ -75,20 +67,12 @@ function App() {
   };
 
   const executeMove = (position: { row: number; col: number }) => {
-    const { board: newBoard, capturedCount } = makeMove(
+    const { board: newBoard } = makeMove(
       gameState.board,
       position,
       gameState.currentPlayer
     );
 
-    const move: Move = {
-      player: gameState.currentPlayer,
-      position,
-      timestamp: Date.now(),
-      capturedCount
-    };
-
-    const newMoveHistory = [...gameState.moveHistory, move];
     const newScore = calculateScore(newBoard);
     const isOver = checkGameOver(newBoard);
     const opponent = gameState.currentPlayer === 'black' ? 'white' : 'black';
@@ -98,7 +82,6 @@ function App() {
       currentPlayer: opponent,
       validMoves: getValidMoves(newBoard, opponent),
       score: newScore,
-      moveHistory: newMoveHistory,
       isGameOver: isOver,
       winner: isOver ? getWinner(newScore) : null
     });
@@ -152,24 +135,9 @@ function App() {
   // ゲーム終了時の処理
   useEffect(() => {
     if (gameState.isGameOver && viewState === 'playing') {
-      const gameLog: GameLog = {
-        gameId,
-        mode: selectedMode,
-        startTime: gameStartTime,
-        endTime: Date.now(),
-        moves: gameState.moveHistory,
-        finalScore: gameState.score,
-        winner: gameState.winner || 'draw'
-      };
-      saveGameLog(gameLog).catch(console.error);
       setViewState('result');
     }
   }, [gameState.isGameOver]);
-
-  const handleQuestionnaireSubmit = (data: QuestionnaireData) => {
-    saveQuestionnaire({ gameId, ...data }).catch(console.error);
-    setViewState('mode-select');
-  };
 
   return (
     <div className="app">
@@ -216,15 +184,7 @@ function App() {
           winner={gameState.winner || 'draw'}
           score={gameState.score}
           finalBoard={gameState.board}
-          onShowQuestionnaire={() => setViewState('questionnaire')}
           onPlayAgain={() => setViewState('mode-select')}
-        />
-      )}
-
-      {viewState === 'questionnaire' && (
-        <Questionnaire
-          onSubmit={handleQuestionnaireSubmit}
-          onSkip={() => setViewState('mode-select')}
         />
       )}
     </div>
