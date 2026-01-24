@@ -30,6 +30,7 @@ function App() {
   const [gameStartTime, setGameStartTime] = useState(0);
   const [visibilityMap, setVisibilityMap] = useState<boolean[][] | null>(null);
   const [lastAiMove, setLastAiMove] = useState<{ row: number; col: number } | null>(null);
+  const [showMiss, setShowMiss] = useState(false);
 
   const startGame = (mode: GameMode) => {
     setSelectedMode(mode);
@@ -49,6 +50,7 @@ function App() {
 
     setVisibilityMap(generateVisibilityMap(mode));
     setLastAiMove(null);
+    setShowMiss(false);
     setViewState('playing');
   };
 
@@ -62,7 +64,9 @@ function App() {
     );
 
     if (!isValid) {
-      // 不正な手はパス扱い
+      // 不正な手はパス扱い、ミス表示
+      setShowMiss(true);
+      setTimeout(() => setShowMiss(false), 1000);
       handlePass();
       return;
     }
@@ -185,6 +189,7 @@ function App() {
                 canPass={gameState.validMoves.length === 0 && gameState.currentPlayer === 'black'}
                 onPass={handlePass}
                 mode={selectedMode}
+                showMiss={showMiss}
               />
               {isAiThinking && <div className="ai-thinking">AIが考え中...</div>}
               <button className="quit-button" onClick={() => setViewState('mode-select')}>

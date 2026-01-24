@@ -7,6 +7,7 @@ interface GameInfoProps {
   canPass: boolean;
   onPass: () => void;
   mode: GameMode;
+  showMiss: boolean;
 }
 
 const modeRules: Record<GameMode, string> = {
@@ -15,7 +16,7 @@ const modeRules: Record<GameMode, string> = {
   'blindfold3': '中央4マス以外見えません'
 };
 
-function GameInfo({ currentPlayer, score, canPass, onPass, mode }: GameInfoProps) {
+function GameInfo({ currentPlayer, score, canPass, onPass, mode, showMiss }: GameInfoProps) {
   return (
     <div className="game-info">
       <div className="rules-section">
@@ -29,10 +30,16 @@ function GameInfo({ currentPlayer, score, canPass, onPass, mode }: GameInfoProps
       </div>
 
       <div className="turn-indicator">
-        <div className={`turn-display ${currentPlayer}`}>
-          <div className={`turn-piece ${currentPlayer}`}></div>
-          <span>{currentPlayer === 'black' ? '黒のターン' : '白のターン'}</span>
-        </div>
+        {showMiss ? (
+          <div className="turn-display miss">
+            <span>Miss!</span>
+          </div>
+        ) : (
+          <div className={`turn-display ${currentPlayer}`}>
+            <div className={`turn-piece ${currentPlayer}`}></div>
+            <span>{currentPlayer === 'black' ? '黒のターン' : '白のターン'}</span>
+          </div>
+        )}
       </div>
 
       <div className="score-display">
