@@ -13,6 +13,9 @@ interface BoardProps {
 }
 
 function Board({ board, validMoves, onCellClick, disabled = false, mode, visibilityMap, lastAiMove }: BoardProps) {
+  // 目隠しモードかどうか
+  const isBlindfoldMode = mode !== 'normal';
+
   const isValidMove = (row: number, col: number): boolean => {
     return validMoves.some(move => move.row === row && move.col === col);
   };
@@ -29,6 +32,18 @@ function Board({ board, validMoves, onCellClick, disabled = false, mode, visibil
     return lastAiMove.row === row && lastAiMove.col === col;
   };
 
+  // セルがクリック可能かどうか判定
+  const isCellClickable = (row: number, col: number, cell: typeof board[0][0]): boolean => {
+    if (disabled) return false;
+    if (isBlindfoldMode) {
+      // 目隠しモード: 石が置かれていない空のセルならクリック可能
+      return cell === null;
+    } else {
+      // 通常モード: 合法手のみクリック可能
+      return isValidMove(row, col);
+    }
+  };
+
   return (
     <div className="board">
       {board.map((row, rowIndex) => (
@@ -37,11 +52,14 @@ function Board({ board, validMoves, onCellClick, disabled = false, mode, visibil
             <Cell
               key={`${rowIndex}-${colIndex}`}
               player={cell}
-              isValidMove={!disabled && isValidMove(rowIndex, colIndex)}
+              isValidMove={isValidMove(rowIndex, colIndex)}
               onClick={() => onCellClick({ row: rowIndex, col: colIndex })}
               isVisible={isCellVisible(rowIndex, colIndex)}
               mode={mode}
               isLastAiMove={isLastAiMove(rowIndex, colIndex)}
+              isClickable={isCellClickable(rowIndex, colIndex, cell)}
+              row={rowIndex}
+              col={colIndex}
             />
           ))}
         </div>

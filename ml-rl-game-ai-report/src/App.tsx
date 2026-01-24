@@ -61,6 +61,9 @@ function App() {
     setViewState('playing');
   };
 
+  // 目隠しモードかどうか
+  const isBlindfoldMode = selectedMode !== 'normal';
+
   // セルクリックハンドラ
   const handleCellClick = (position: { row: number; col: number }) => {
     if (gameState.isGameOver || gameState.currentPlayer !== 'black' || isAiThinking) {
@@ -73,6 +76,10 @@ function App() {
     );
 
     if (!isValid) {
+      if (isBlindfoldMode) {
+        // 目隠しモード: 不正な手はパス扱い
+        handlePass();
+      }
       return;
     }
 
