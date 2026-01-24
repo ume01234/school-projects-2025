@@ -31,6 +31,31 @@
 - TypeScript
 - Vite
 
+## ファイル構成
+
+```
+├── index.html              # エントリーポイント
+├── vite.config.ts          # Vite設定
+├── src/
+│   ├── main.tsx            # Reactアプリのマウント
+│   ├── App.tsx             # メインコンポーネント（ゲーム状態管理）
+│   ├── App.css             # アプリ全体のスタイル
+│   ├── index.css           # グローバルスタイル
+│   ├── components/         # UIコンポーネント
+│   │   ├── Board.tsx       # 盤面コンポーネント
+│   │   ├── Cell.tsx        # 各マスのコンポーネント
+│   │   ├── GameInfo.tsx    # ターン・スコア表示
+│   │   ├── GameResult.tsx  # 結果画面
+│   │   ├── ModeSelector.tsx # モード選択画面
+│   │   └── *.css           # 各コンポーネントのスタイル
+│   └── game/               # ゲームロジック
+│       ├── types.ts        # 型定義
+│       ├── othelloLogic.ts # オセロのルール実装
+│       ├── randomAI.ts     # ランダムAI
+│       └── visibilityUtils.ts # 盤面可視性の制御
+└── dist/                   # ビルド成果物（自動生成）
+```
+
 ## セットアップ
 
 ```bash
