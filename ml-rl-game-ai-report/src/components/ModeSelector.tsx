@@ -42,7 +42,7 @@ const modes: ModeInfo[] = [
 function ModeSelector({ onSelectMode }: ModeSelectorProps) {
   return (
     <div className="mode-selector">
-      <h1 className="title">オセロ実験プラットフォーム</h1>
+      <h1 className="title">目隠しリバーシ</h1>
       <p className="subtitle">モードを選択してください</p>
 
       <div className="modes-grid">
